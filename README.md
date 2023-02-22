@@ -34,3 +34,9 @@ requirements:
     M = {machine_number:[[task1, starting_time1, ending_time1], [task2, starting_time2, ending_time2]]}
 
     nodes_infos = {node : [processed_or_not, node_parents, starting_time, ending_time]} (if not processed starting/ending_time = None)
+
+    # tunable parameters
+    alpha = 0.1
+    beta = 2
+    C = 1
+    Q = 1
