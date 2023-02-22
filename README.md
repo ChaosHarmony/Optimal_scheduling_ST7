@@ -17,12 +17,18 @@ networkx
 
 to complete...
 requirements:
-m = number of machines
-M = machines dictionnary (machines are denoted from 0 to m-1)
-runtime = runtime dictionnary
-pheromone = matrix of pheromones
-last_used_machine (initialised to 0)
-last_processed_task (initialised to None)
+
+    m = number of machines
+
+    M = machines dictionnary (machines are denoted from 0 to m-1)
+
+    runtime = runtime dictionnary
+
+    pheromone = matrix of pheromones
+
+    last_used_machine (initialised to 0)
+
+    last_processed_task (initialised to None)
 
     Machine dictionnary will be as follows:
     M = {machine_number:[[task1, starting_time1, ending_time1], [task2, starting_time2, ending_time2]]}
