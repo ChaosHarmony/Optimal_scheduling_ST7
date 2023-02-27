@@ -9,13 +9,18 @@ Transforms the graph so ants can walk on it
 """
 
 
+def convert_to_seconds(ch):
+    hh, mm, ss = ch.split(':')
+    return 3600*int(hh)+60*int(mm)+float(ss)
+
+
 def extract_directed_graph(graph_path):
     graph_ds = pd.read_json(graph_path)['nodes']
     graph_nodes = graph_ds.keys()
     graph_edges = []
     graph_data = []
     for node in graph_nodes:
-        graph_data.append(graph_ds[node]['Data'])
+        graph_data.append(convert_to_seconds(graph_ds[node]['Data']))
         for parent in graph_ds[node]['Dependencies']:
             graph_edges.append((parent, node))
 
