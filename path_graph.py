@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import networkx as nx
+import matplotlib.pyplot as plt
+import time
 
 """
 Transforms the graph so ants can walk on it
@@ -49,11 +51,24 @@ def get_end(graph: nx.DiGraph, graph_nodes):
     return [node for node in graph_nodes if is_end(graph, node)]
 
 
+def transform(graph: nx.DiGraph, graph_nodes: list):
+    """
+    Make a in place transformation of the networkx graph by adding "start" node and "end" node
+    """
+    roots = get_root(graph, graph_nodes)
+    ends = get_end(graph, graph_nodes)
+    graph.add_node("start", process_time="00:00:00")
+    graph.add_node("end", process_time="00:00:00")
+    graph.add_edges_from([(node, "end") for node in ends])
+    graph.add_edges_from([("start", node) for node in roots])
+    return None
+
+
 if __name__ == "__main__":
 
     print("TESTING RANGE")
     print("===============================================")
-    graph_path = "./Graphs/smallComplex.json"
+    graph_path = "./Graphs/smallRandom.json"
     print("getting graph from ", graph_path, " ...")
     graph, graph_nodes = extract_directed_graph(graph_path)
 
@@ -66,5 +81,28 @@ if __name__ == "__main__":
 
     print("===============================================")
     # print(graph.edges, graph.nodes)
+
+    print("starting graph transformation")
+    transform(graph, graph_nodes)
+    new_nodes = [*graph_nodes, "start", "end"]
+    print("New root should be start : ", get_root(graph, new_nodes))
+    print("New end should be end :", get_end(graph, new_nodes))
+    modelling = input("Do you want to see the small graph modified (y/n) :")
+    try:
+        modelling in ["y", "yes", "n", "no"]
+    except:
+        print("wrong input !! no is choosen by default")
+        modelling = 'n'
+    if modelling in ["y", "yes", 'Y', "Yes", "YES"]:
+        print("Modelling for the smallRandom...")
+        chrono = time.time()
+        graph_path = "./Graphs/smallRandom.json"
+        graph, graph_nodes = extract_directed_graph(graph_path)
+        transform(graph, graph_nodes)
+        print("Process as taken :", time.time()-chrono, "s")
+        plt.tight_layout()
+        nx.draw_networkx(graph, arrows=True)
+        plt.show()
+        print("end view...")
 
     print("END")
