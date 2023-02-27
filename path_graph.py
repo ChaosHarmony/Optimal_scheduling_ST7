@@ -8,11 +8,9 @@ import time
 Transforms the graph so ants can walk on it
 """
 
-
 def convert_to_seconds(ch):
-    hh, mm, ss = ch.split(':')
+    hh,mm,ss = ch.split(':')
     return 3600*int(hh)+60*int(mm)+float(ss)
-
 
 def extract_directed_graph(graph_path):
     graph_ds = pd.read_json(graph_path)['nodes']
