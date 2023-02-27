@@ -3,11 +3,9 @@ import numpy as np
 
 class Ant():
 
-    def __init__(self, starting_point, objectif_point, alpha, beta):
+    def __init__(self, starting_point, objectif_point):
         self.solution = [starting_point]
         self.objectif = objectif_point
-        self.alpha = alpha
-        self.beta = beta
 
     def is_visited(self, node):
         return node in self.solution
@@ -20,8 +18,8 @@ class Ant():
 
 
 class Ant_TGE(Ant):
-    def __init__(self, starting_point, objectif_point, alpha, beta, nb_machines):
-        super().__init__(starting_point, objectif_point, alpha, beta)
+    def __init__(self, starting_point, objectif_point, nb_machines):
+        super().__init__(starting_point, objectif_point)
         self.nb_machines = nb_machines
         self.machines_time_track = np.zeros((1, nb_machines), dtype=float)
         self.affected_machine = []
