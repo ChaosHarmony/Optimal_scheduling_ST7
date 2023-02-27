@@ -9,7 +9,7 @@ Transforms the graph so ants can walk on it
 """
 
 
-def extract_directed_graph(graph_path):
+def extract_directed_graph(graph_path: str):
     graph_ds = pd.read_json(graph_path)['nodes']
     graph_nodes = graph_ds.keys()
     graph_edges = []
@@ -86,9 +86,10 @@ if __name__ == "__main__":
     new_nodes = [*graph_nodes, "start", "end"]
     print("New root should be start : ", get_root(graph, new_nodes))
     print("New end should be end :", get_end(graph, new_nodes))
-    modelling = input("Do you want to see the small graph modified (y/n) :")
+    modelling = input(
+        "Do you want to see the small graph modified (y/n) (no by default):")
     try:
-        modelling in ["y", "yes", "n", "no"]
+        modelling in ["y", "yes", "n", "no", '']
     except:
         print("wrong input !! no is choosen by default")
         modelling = 'n'
