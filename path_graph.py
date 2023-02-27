@@ -65,5 +65,6 @@ if __name__ == "__main__":
     print("Ends of our graph are :", get_end(graph, graph_nodes))
 
     print("===============================================")
+    # print(graph.edges, graph.nodes)
 
     print("END")
