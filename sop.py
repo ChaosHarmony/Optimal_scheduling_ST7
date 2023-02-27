@@ -16,7 +16,7 @@ def is_advailable(graph: nx.DiGraph, node: int or str, visited_nodes: list):
     return True
 
 
-def advailable_set_of_node(graph: nx.DiGraph, graph_nodes: list, visited_node: list):
+def available_set_of_node(graph: nx.DiGraph, graph_nodes: list, visited_node: list):
     """
     Create a set of every accessible nodes from the visited nodes
     """
@@ -42,25 +42,25 @@ if __name__ == "__main__":
     print('=========================================')
     print("starting test of advailability")
     visited_node = []
-    start_set = advailable_set_of_node(
+    start_set = available_set_of_node(
         small_graph, small_graph_nodes, visited_node)
     print("Used visited node list :", visited_node)
     print("We should only have start in the returned set :", start_set,
           "   then the test is good :", start_set == set(["start"]))
     visited_node = ["start"]
-    start_set = advailable_set_of_node(
+    start_set = available_set_of_node(
         small_graph, small_graph_nodes, visited_node)
     print("\nUsed visited node list :", visited_node)
     print("We should only have 1 in the returned set :", start_set,
           "   then the test is good :", start_set == set([1]))
     visited_node = ["start", 1]
-    start_set = advailable_set_of_node(
+    start_set = available_set_of_node(
         small_graph, small_graph_nodes, visited_node)
     print("\nUsed visited node list :", visited_node)
     print("We should only have 2,3,4 in the returned set :", start_set,
           "   then the test is good :", start_set == set([2, 3, 4]))
     visited_node = ["start", 1, 2, 3, 4, 5, 7, 9]
-    start_set = advailable_set_of_node(
+    start_set = available_set_of_node(
         small_graph, small_graph_nodes, visited_node)
     print("\nUsed visited node list :", visited_node)
     print("The returned set is : ", start_set)
