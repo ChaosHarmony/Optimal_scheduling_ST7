@@ -21,7 +21,10 @@ def extract_directed_graph(graph_path: str):
 
     graph = nx.DiGraph()
     graph.add_edges_from(graph_edges)
-    graph.add_nodes_from(graph_nodes, process_time=graph_data)
+
+    for i in range(len(graph_nodes)):
+        graph.add_node(graph_nodes[i], process_time=graph_data[i], weight=i)
+
     return graph, graph_nodes
 
 
@@ -79,6 +82,10 @@ if __name__ == "__main__":
     print("Roots of our graph are : ", get_root(graph, graph_nodes))
     print("Ends of our graph are :", get_end(graph, graph_nodes))
 
+    print("===============================================")
+    print("test on data storage")
+    print("data inside node _1_ :", graph.nodes[graph_nodes[0]])
+    print("data inside node _5_ :", graph.nodes[graph_nodes[4]])
     print("===============================================")
 
     print("starting graph transformation")
