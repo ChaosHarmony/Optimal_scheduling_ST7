@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
     print("TESTING RANGE")
     print("===============================================")
-    graph_path = "./Graphs/smallComplex.json"
+    graph_path = "./Graphs/smallRandom.json"
     print("getting graph from ", graph_path, " ...")
     graph, graph_nodes = extract_directed_graph(graph_path)
 
