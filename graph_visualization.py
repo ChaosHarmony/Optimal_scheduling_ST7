@@ -2,7 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import pandas as pd
 
-file_path = './Graphs/smallComplex.json'
+file_path = './Graphs/smallRandom.json'
 
 ds_graph = pd.read_json(file_path)
 
