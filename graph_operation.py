@@ -1,9 +1,14 @@
 import numpy as np
+import itertools
 import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
 import time
 
+
+###################################################################################
+##############              Graph extraction                   ####################
+###################################################################################
 
 def convert_to_seconds(ch):
     hh, mm, ss = ch.split(':')
@@ -28,6 +33,10 @@ def extract_directed_graph(graph_path: str):
         graph.add_node(graph_nodes[i], process_time=graph_data[i], weight=i)
 
     return graph, graph_nodes
+
+###################################################################################
+############              Graph transformation                   ##################
+###################################################################################
 
 
 def is_end(graph: nx.DiGraph, node):
@@ -67,6 +76,23 @@ def transform(graph: nx.DiGraph, graph_nodes: list):
     graph.add_edges_from([(node, "end") for node in ends])
     graph.add_edges_from([("start", node) for node in roots])
     return None
+
+###################################################################################
+###############              Complete graph                   #####################
+###################################################################################
+
+
+def generate_complete_graph(graph):
+    complete_graph = nx.Graph()
+    leaves = graph.nodes
+    complete_graph.add_nodes_from(graph.nodes)
+    complete_graph.add_edges_from(itertools.combinations(leaves, 2))
+    return complete_graph
+
+
+###################################################################################
+##############              Availibility set                   ####################
+###################################################################################
 
 
 def is_advailable(graph: nx.DiGraph, node: int or str, visited_nodes: list):
