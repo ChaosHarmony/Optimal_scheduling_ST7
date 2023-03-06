@@ -46,12 +46,3 @@ class Ant_TGE(Ant):
 
     def add_machine(self, machine):
         self.affected_machine.append(machine)
-
-
-def init_pheromones(self, graph):
-    pheromones = nx.Graph()
-    leaves = graph.nodes
-    pheromones.add_nodes_from(graph.nodes)
-    for edge in list(itertools.combinations(leaves, 2)):
-        pheromones.add_edge(edge[0], edge[1], weight=1)
-    return pheromones
