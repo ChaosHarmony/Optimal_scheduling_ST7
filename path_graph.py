@@ -13,22 +13,13 @@ def convert_to_seconds(ch):
     return 3600*int(hh)+60*int(mm)+float(ss)
 
 
-<< << << < HEAD
-def extract_directed_graph(graph_path):
-
-
-== == == =
-
-
 def extract_directed_graph(graph_path: str):
 
-
->>>>>> > 4daccf977944c6f9d065fda121a584057949c0d4
-graph_ds = pd.read_json(graph_path)['nodes']
-graph_nodes = graph_ds.keys()
- graph_edges = []
-  graph_data = []
-   for node in graph_nodes:
+    graph_ds = pd.read_json(graph_path)['nodes']
+    graph_nodes = graph_ds.keys()
+    graph_edges = []
+    graph_data = []
+    for node in graph_nodes:
         graph_data.append(convert_to_seconds(graph_ds[node]['Data']))
         for parent in graph_ds[node]['Dependencies']:
             graph_edges.append((parent, node))
