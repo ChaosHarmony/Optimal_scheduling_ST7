@@ -72,11 +72,26 @@ class AntColony():
     #   Running the colony
     ##################################################################
 
-    def run(self, attractive_func):
+    def run(self):
+        """
+        Works only with ant_TGE
+        """
+
         while not self.has_finished():
             for i in range(self.n_ants):
-                self.colony_list[i].choose_node(
-                    self.directed_graph, self.complete_graph, attractive_func)
+                ant = self.colony_list[i]
+                ant = ants.Ant_TGE
+                if True in ant.machine_available():
+                    chosen_machine = ant.choose_machine()
+                else:
+                    min_duration = min(ant.machines_time_track)
+                    ant.update_all_time_track(duration=min_duration)
+
+                choosen_node = go.rank_reachable_nodes(ant, self)
+                ant.add_node(choosen_node)
+                time_elapsed = self.directed_graph.nodes[choosen_node]['process_time']
+                ant.add_machine(chosen_machine)
+                ant.update_machine_time_track(chosen_machine, time_elapsed)
 
     def reset(self):
         for i in range(self.n_ants):
