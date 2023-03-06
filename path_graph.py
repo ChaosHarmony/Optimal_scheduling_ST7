@@ -9,22 +9,36 @@ Transforms the graph so ants can walk on it
 """
 
 def convert_to_seconds(ch):
-    hh,mm,ss = ch.split(':')
+    hh, mm, ss = ch.split(':')
     return 3600*int(hh)+60*int(mm)+float(ss)
 
+
+<< << << < HEAD
 def extract_directed_graph(graph_path):
-    graph_ds = pd.read_json(graph_path)['nodes']
-    graph_nodes = graph_ds.keys()
-    graph_edges = []
-    graph_data = []
-    for node in graph_nodes:
+
+
+== == == =
+
+
+def extract_directed_graph(graph_path: str):
+
+
+>>>>>> > 4daccf977944c6f9d065fda121a584057949c0d4
+graph_ds = pd.read_json(graph_path)['nodes']
+graph_nodes = graph_ds.keys()
+ graph_edges = []
+  graph_data = []
+   for node in graph_nodes:
         graph_data.append(convert_to_seconds(graph_ds[node]['Data']))
         for parent in graph_ds[node]['Dependencies']:
             graph_edges.append((parent, node))
 
     graph = nx.DiGraph()
     graph.add_edges_from(graph_edges)
-    graph.add_nodes_from(graph_nodes, process_time=graph_data)
+
+    for i in range(len(graph_nodes)):
+        graph.add_node(graph_nodes[i], process_time=graph_data[i], weight=i)
+
     return graph, graph_nodes
 
 
@@ -83,6 +97,10 @@ if __name__ == "__main__":
     print("Ends of our graph are :", get_end(graph, graph_nodes))
 
     print("===============================================")
+    print("test on data storage")
+    print("data inside node _1_ :", graph.nodes[graph_nodes[0]])
+    print("data inside node _5_ :", graph.nodes[graph_nodes[4]])
+    print("===============================================")
     # print(graph.edges, graph.nodes)
 
     print("starting graph transformation")
@@ -90,9 +108,10 @@ if __name__ == "__main__":
     new_nodes = [*graph_nodes, "start", "end"]
     print("New root should be start : ", get_root(graph, new_nodes))
     print("New end should be end :", get_end(graph, new_nodes))
-    modelling = input("Do you want to see the small graph modified (y/n) :")
+    modelling = input(
+        "Do you want to see the small graph modified (y/n) (no by default):")
     try:
-        modelling in ["y", "yes", "n", "no"]
+        modelling in ["y", "yes", "n", "no", '']
     except:
         print("wrong input !! no is choosen by default")
         modelling = 'n'

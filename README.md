@@ -6,12 +6,14 @@ This project focus on the optimization of a task graph with precedence constrain
 
 Let's considerer that we have m machines with the same feature, same specific there are identical. We need to run a set of n jobs on the m machines optimal to reduce the makespan (= total time of computation) respecting priority orders on the jobs. Using the convenient notation for optimal scheduling problem we can classifie or problem as $P|prec|C_{max}$.
 
-# Depedencies
+# Dependencies
 
 Code is written in python, you'll need :
-Matplotlib,
-numpy,
-networkx
+- numpy 1.24.2,
+- pandas 1.4.1,
+- networkx 3.0,
+- scipy 1.10.1,
+- matplotlib 3.7.0
 
 # Instruction on code
 
