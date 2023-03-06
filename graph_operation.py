@@ -1,4 +1,5 @@
 import AntColony
+import ants
 import numpy as np
 import itertools
 import pandas as pd
@@ -140,6 +141,40 @@ def rank_reachable_nodes(graph: nx.DiGraph, graph_nodes: list, visited_node: lis
     reachable_nodes = available_set_of_node(graph, graph_nodes, visited_node)
     ranked_nodes = sorted(reachable_nodes, key=lambda x: (
         C*weight_nodes[x])**alpha*(colony.get_pheromon[curr_node][x])**beta)
+
+
+def machine_attribution(graph: nx.Digraph, ants: list, colony: AntColony.AntColony, ant_tge: ants.Ant_TGE):
+    '''build a machine dictionnary as follows:
+    M = {machine_number:[[task1, starting_time1, ending_time1], [task2, starting_time2, ending_time2]]}
+    machines are denoted from 0 to nb_machines-1
+    '''
+
+    nb_machines = ant_tge.nb_machines
+    starting_time = 0
+    ending_time = 0
+    solution = colony.get_solution_list
+    machine_attribution = colony.get_machine_attribution_list
+    m = len(solution)
+    M = {k: [] for k in range(nb_machines)}
+    last_processed_machine = machine_attribution[0]
+    for i in range(m):
+        ending_time = starting_time + graph.node[solution[i]]['process_time']
+        M[machine_attribution[i]].append(
+            [solution[i], starting_time, ending_time])
+        if last_processed_machine == machine_attribution[i]:
+            starting_time = ending_time
+        last_processed_machine = machine_attribution[i]
+    return M
+
+
+def path_cost(graph: nx.Digraph, ants: list, colony: AntColony.AntColony, ant_tge: ants.Ant_TGE):
+    nb_machines = ant_tge.nb_machines
+    M = machine_attribution(graph, ants, colony, ant_tge)
+    return max([M[k][-1][2] for k in range(nb_machines)])
+
+
+def update_pheromone(graph: nx.DiGraph):
+    pass
 
 
 if __name__ == "__main__":
