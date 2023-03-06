@@ -18,9 +18,6 @@ class Ant():
     def has_finished(self):
         return self.objectif == self.solution[-1]
 
-    def choose_node(self, DAG, CG, attractivity_function, advailable):
-        pass
-
     def reset(self):
         self.solution = [self.solution[0]]
 
@@ -46,9 +43,15 @@ class Ant_TGE(Ant):
     def choose_machine(self):
         possible_machines = []
         for i in range(self.nb_machines):
-            if self.machine_available():
+            ad = self.machine_available()
+            if ad[0][i]:
                 possible_machines.append(i)
         return np.random.choice(possible_machines)
 
     def add_machine(self, machine):
         self.affected_machine.append(machine)
+
+    def reset(self):
+        super().reset()
+        self.machines_time_track = np.zeros((1, self.nb_machines), dtype=float)
+        self.affected_machine = []

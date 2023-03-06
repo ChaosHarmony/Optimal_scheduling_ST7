@@ -1,5 +1,3 @@
-import AntColony
-import ants
 import numpy as np
 import itertools
 import pandas as pd
@@ -79,8 +77,8 @@ def transform(graph: nx.DiGraph, graph_nodes: list):
     """
     roots = get_root(graph, graph_nodes)
     ends = get_end(graph, graph_nodes)
-    graph.add_node("start", process_time="00:00:00")
-    graph.add_node("end", process_time="00:00:00")
+    graph.add_node("start", process_time=0)
+    graph.add_node("end", process_time=0)
     graph.add_edges_from([(node, "end") for node in ends])
     graph.add_edges_from([("start", node) for node in roots])
     return None
@@ -134,13 +132,17 @@ def get_weight_nodes(graph: nx.DiGraph, graph_nodes: list):
     '''
     weight_nodes = {}
     for node in graph_nodes:
-        weight_nodes[node] = graph.nodes[node]['process_time'] + \
-            max([graph.nodes[j]['process_time']
-                for j in graph.successors[node]])
+        max_tab = [graph.nodes[j]['process_time']
+                   for j in graph.successors(node)]
+        if max_tab != []:
+            weight_nodes[node] = graph.nodes[node]['process_time'] + \
+                max(max_tab)
+        else:
+            weight_nodes[node] = graph.nodes[node]['process_time']
     return weight_nodes
 
 
-def probability_construction(curr_node: int, reachable_nodes: list, weight_nodes: dict, colony: AntColony.AntColony):
+def probability_construction(curr_node: int, reachable_nodes: list, weight_nodes: dict, colony):
     sum = 0
     probability_per_node = []
     for node in reachable_nodes:
@@ -148,52 +150,52 @@ def probability_construction(curr_node: int, reachable_nodes: list, weight_nodes
             (colony.get_pheromon(curr_node, node))**colony.beta
         probability_per_node.append(prob)
         sum += prob
-    return probability_per_node / sum
+    if len(reachable_nodes) == 1:
+        return [1]
+
+    return 1/sum * np.array(probability_per_node)
 
 
-def rank_reachable_nodes(selected_ant: ants.Ant, colony: AntColony.AntColony):
+def rank_reachable_nodes(selected_ant, colony):
     curr_node = selected_ant.solution[-1]
     graph = colony.directed_graph
     nodes = list(graph)
-    reachable_nodes = available_set_of_node(
-        graph, nodes, selected_ant.solution)
+    reachable_nodes = list(available_set_of_node(
+        graph, nodes, selected_ant.solution))
     ranked_nodes = np.random.choice(reachable_nodes, p=probability_construction(
         curr_node, reachable_nodes, get_weight_nodes(graph, nodes), colony))
     return ranked_nodes
 
 
-def machine_attribution(graph: nx.Digraph, ants: list, colony: AntColony.AntColony, ant_tge: ants.Ant_TGE):
+def machine_attribution(colony, solution, machine_attribution):
     '''build a machine dictionnary as follows:
     M = {machine_number:[[task1, starting_time1, ending_time1], [task2, starting_time2, ending_time2]]}
     machines are denoted from 0 to nb_machines-1
     '''
 
-    nb_machines = ant_tge.nb_machines
+    nb_machines = colony.colony_list[0].nb_machines
+    m = len(colony.colony_list[0].affected_machine)
     starting_time = 0
     ending_time = 0
-    solution = colony.get_solution_list
-    machine_attribution = colony.get_machine_attribution_list
-    m = len(solution)
+    graph = colony.directed_graph
     M = {k: [] for k in range(nb_machines)}
     last_processed_machine = machine_attribution[0]
+    # don't forget "start and end" nodes that are not counted in the machine attr
     for i in range(m):
-        ending_time = starting_time + graph.node[solution[i]]['process_time']
-        M[machine_attribution[i]].append(
-            [solution[i], starting_time, ending_time])
+        ending_time = starting_time + \
+            graph.nodes[solution[i+1]]['process_time']
+        M[machine_attribution[i-1]].append(
+            [solution[i+1], starting_time, ending_time])
         if last_processed_machine == machine_attribution[i]:
             starting_time = ending_time
         last_processed_machine = machine_attribution[i]
     return M
 
 
-def path_cost(graph: nx.Digraph, ants: list, colony: AntColony.AntColony, ant_tge: ants.Ant_TGE):
-    nb_machines = ant_tge.nb_machines
-    M = machine_attribution(graph, ants, colony, ant_tge)
+def path_cost(ant, colony):
+    nb_machines = ant.nb_machines
+    M = machine_attribution(colony, ant.solution, ant.affected_machine)
     return max([M[k][-1][2] for k in range(nb_machines)])
-
-
-def update_pheromone(graph: nx.DiGraph):
-    pass
 
 
 if __name__ == "__main__":
