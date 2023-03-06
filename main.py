@@ -3,12 +3,6 @@ import ants
 import graph_operation as go
 
 
-def makespan(solution):
-    # TODO compute Makespan
-    # TODO ~~ try to do it without knowledge of machines distribution
-    pass
-
-
 def get_ant_path(ant_solution: list):
     """
     Construct the path as a list of edges of each ants in the colony
@@ -42,6 +36,8 @@ def get_best_solution(objective_function: function, results):
 
 
 def main(n_iteration, graph_path, n_ant, n_machines, objective_function, attractive_function):
+    global N_MACHINES
+    N_MACHINES = n_machines
     print("Set up")
     direct_graph, nodes_list = go.extract_directed_graph(graph_path)
     go.transform(direct_graph, nodes_list)

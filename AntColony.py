@@ -6,14 +6,16 @@ import matplotlib.pyplot as plt
 
 
 class AntColony():
-    def __init__(self, DAG_scheduling: nx.DiGraph, ants: list, Q: int, evaporation: float):
+    def __init__(self, DAG_scheduling: nx.DiGraph, ants: list, Q: int, evaporation: float, C: int, alpha: float, beta: float):
         self.directed_graph = DAG_scheduling
         self.complete_graph = go.generate_complete_graph(DAG_scheduling)
         self.colony_list = ants
         self.n_ants = len(ants)
         self.rho = evaporation
         self.Q = Q
-
+        self.alpha = alpha
+        self.beta = beta
+        self.C = C
     ####################################################################
     # Pheromon part
     #################################################################

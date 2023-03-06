@@ -1,4 +1,5 @@
 import AntColony
+import ants
 import numpy as np
 import itertools
 import pandas as pd
@@ -127,19 +128,38 @@ def available_set_of_node(graph: nx.DiGraph, graph_nodes: list, visited_node: li
     return available
 
 
-def weight_nodes(graph: nx.DiGraph, graph_nodes: list):
+def get_weight_nodes(graph: nx.DiGraph, graph_nodes: list):
+    '''
+    Dictionnaire des poids pour la fonction cost
+    '''
     weight_nodes = {}
     for node in graph_nodes:
         weight_nodes[node] = graph.nodes[node]['process_time'] + \
             max([graph.nodes[j]['process_time']
                 for j in graph.successors[node]])
+    return weight_nodes
 
 
-def rank_reachable_nodes(graph: nx.DiGraph, graph_nodes: list, visited_node: list, ants: list, colony: AntColony.AntColony):
-    curr_node = ants.solution[-1]
-    reachable_nodes = available_set_of_node(graph, graph_nodes, visited_node)
-    ranked_nodes = sorted(reachable_nodes, key=lambda x: (
-        C*weight_nodes[x])**alpha*(colony.get_pheromon[curr_node][x])**beta)
+def probability_construction(curr_node: int, reachable_nodes: list, weight_nodes: dict, colony: AntColony.AntColony):
+    sum = 0
+    probability_per_node = []
+    for node in reachable_nodes:
+        prob = (colony.C*weight_nodes[node])**colony.alpha * \
+            (colony.get_pheromon(curr_node, node))**colony.beta
+        probability_per_node.append(prob)
+        sum += prob
+    return probability_per_node / sum
+
+
+def rank_reachable_nodes(selected_ant: ants.Ant, colony: AntColony.AntColony):
+    curr_node = selected_ant.solution[-1]
+    graph = colony.directed_graph
+    nodes = list(graph)
+    reachable_nodes = available_set_of_node(
+        graph, nodes, selected_ant.solution)
+    ranked_nodes = np.random.choice(reachable_nodes, p=probability_construction(
+        curr_node, reachable_nodes, get_weight_nodes(graph, nodes), colony))
+    return ranked_nodes
 
 
 if __name__ == "__main__":
