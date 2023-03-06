@@ -6,11 +6,13 @@ import matplotlib.pyplot as plt
 
 
 class AntColony():
-    def __init__(self, DAG_scheduling: nx.DiGraph, ants: list):
+    def __init__(self, DAG_scheduling: nx.DiGraph, ants: list, Q: int, evaporation: float):
         self.directed_graph = DAG_scheduling
         self.complete_graph = go.generate_complete_graph(DAG_scheduling)
         self.colony_list = ants
         self.n_ants = len(ants)
+        self.rho = evaporation
+        self.Q = Q
 
     ####################################################################
     # Pheromon part
@@ -21,7 +23,7 @@ class AntColony():
         for edge in list(itertools.combinations(leaves, 2)):
             print("inside")
             self.complete_graph.update(
-                [(edge[0], edge[1], {'pheromon trail': 1.})])
+                [(edge[0], edge[1], {'pheromon trail': 100.})])
 
     def get_pheromon(self, u, v):
         """
@@ -38,8 +40,7 @@ class AntColony():
         pheromon = pheromon - P -> pheromon_value = -P
         in place modification on the complete_graph
         """
-        new_value = self.get_pheromon(u, v) - pheromon_value
-        self.complete_graph.update((u, v, {'pheromon trail': new_value}))
+        self.complete_graph.update((u, v, {'pheromon trail': pheromon_value}))
 
     #################################################################
     # Generalized ant operations
@@ -69,7 +70,15 @@ class AntColony():
     #   Running the colony
     ##################################################################
 
-    def run():
+    def run(self, attractive_func):
+        while not self.has_finished():
+            for i in range(self.n_ants):
+                self.colony_list[i].choose_node(
+                    self.directed_graph, self.complete_graph, attractive_func)
+
+    def reset(self):
+        for i in range(self.n_ants):
+            self.colony_list[i].reset()
 
 
 if __name__ == "__main__":

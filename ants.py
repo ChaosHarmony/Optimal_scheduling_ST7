@@ -19,7 +19,10 @@ class Ant():
         return self.objectif == self.solution[-1]
 
     def choose_node(self, DAG, CG, attractivity_function, advailable):
-        advailable_nodes
+        pass
+
+    def reset(self):
+        self.solution = [self.solution[0]]
 
 
 class Ant_TGE(Ant):
