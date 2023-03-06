@@ -48,6 +48,12 @@ class AntColony():
     def get_solution_list(self):
         return [self.colony_list[i].solution for i in range(self.n_ants)]
 
+    def has_finished(self):
+        for i in range(self.n_ants):
+            if not self.colony_list[i].has_finished():
+                return False
+        return True
+
     def get_machine_attribution_list(self):
         """
         Only works if ants are Ant_TGE type
@@ -60,7 +66,10 @@ class AntColony():
         return [self.colony_list[i].affected_machine for i in range(self.n_ants)]
 
     ##################################################################
-    #
+    #   Running the colony
+    ##################################################################
+
+    def run():
 
 
 if __name__ == "__main__":
@@ -85,4 +94,4 @@ if __name__ == "__main__":
 
     print('initialzing pheromon, should update the complete graph')
     colony.init_pheromones()
-    print("pheromones added : ", colony.complete_graph.edges)
+    print("pheromones added : ", colony.complete_graph.edges['pheromon trail'])

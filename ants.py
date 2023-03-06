@@ -18,6 +18,9 @@ class Ant():
     def has_finished(self):
         return self.objectif == self.solution[-1]
 
+    def choose_node(self, DAG, CG, attractivity_function, advailable):
+        advailable_nodes
+
 
 class Ant_TGE(Ant):
     def __init__(self, starting_point, objectif_point, nb_machines):
