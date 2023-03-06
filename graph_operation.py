@@ -102,7 +102,7 @@ def generate_complete_graph(graph):
 ###################################################################################
 
 
-def is_advailable(graph: nx.DiGraph, node: int or str, visited_nodes: list):
+def is_available(graph: nx.DiGraph, node: int or str, visited_nodes: list):
     """
     Tells if node is accessable with the list of visited_nodes, with precedence constraints //
     if node is already visited -> no need to go back to it
@@ -120,11 +120,11 @@ def available_set_of_node(graph: nx.DiGraph, graph_nodes: list, visited_node: li
     """
     Create a set of every accessible nodes from the visited nodes
     """
-    advailable = set()
+    available = set()
     for node in graph_nodes:
-        if is_advailable(graph, node, visited_node):
-            advailable.add(node)
-    return advailable
+        if is_available(graph, node, visited_node):
+            available.add(node)
+    return available
 
 
 def weight_nodes(graph: nx.DiGraph, graph_nodes: list):
