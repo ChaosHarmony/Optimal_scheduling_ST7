@@ -1,3 +1,4 @@
+import AntColony
 import numpy as np
 import itertools
 import pandas as pd
@@ -6,9 +7,15 @@ import matplotlib.pyplot as plt
 import time
 
 
+alpha = 0.1
+beta = 2
+C = 1
+Q = 1
+
 ###################################################################################
 ##############              Graph extraction                   ####################
 ###################################################################################
+
 
 def convert_to_seconds(ch):
     hh, mm, ss = ch.split(':')
@@ -118,6 +125,21 @@ def available_set_of_node(graph: nx.DiGraph, graph_nodes: list, visited_node: li
         if is_available(graph, node, visited_node):
             available.add(node)
     return available
+
+
+def weight_nodes(graph: nx.DiGraph, graph_nodes: list):
+    weight_nodes = {}
+    for node in graph_nodes:
+        weight_nodes[node] = graph.nodes[node]['process_time'] + \
+            max([graph.nodes[j]['process_time']
+                for j in graph.successors[node]])
+
+
+def rank_reachable_nodes(graph: nx.DiGraph, graph_nodes: list, visited_node: list, ants: list, colony: AntColony.AntColony):
+    curr_node = ants.solution[-1]
+    reachable_nodes = available_set_of_node(graph, graph_nodes, visited_node)
+    ranked_nodes = sorted(reachable_nodes, key=lambda x: (
+        C*weight_nodes[x])**alpha*(colony.get_pheromon[curr_node][x])**beta)
 
 
 if __name__ == "__main__":
