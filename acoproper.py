@@ -2,68 +2,9 @@ import numpy as np
 import networkx as nx
 import json
 import matplotlib.pyplot as plt
+from Job import Job
+from Machine import Machine
 from queue import PriorityQueue
-
-class Job:
-    num: int = 0
-    processing_time: float = 0.0
-    dependencies: list = []
-    time_completed: float = None
-    
-    def __init__(self, num, processing_time, dependencies):
-        self.num = num
-        self.processing_time = processing_time
-        self.dependencies = dependencies
-    
-    def __init__(self, num):
-        self.num = num
-        
-    def __repr__(self):
-        return f"Job {self.num}"
-    
-    def get_processing_time(self):
-        return self.processing_time
-    
-    def get_dependencies(self):
-        return self.dependencies
-    
-    def set_time_completed(self, time_completed: float):
-        self.time_completed = time_completed
-    
-    def reset_time_completed(self):
-        self.time_completed = 0.0
-     
-
-class Machine:
-    id = 0
-    schedule : list[(Job, float, float)] = None
-    jobs_performed : int = 0
-    current_job_end_time : float = 0.0
-    
-    def __init__(self, id):
-        self.id = id
-        self.schedule = []
-    def __repr__(self):
-        # return f"M{self.id}: {list(map(lambda x: x[0], self.schedule))}"
-        return f"M{self.id}: {self.schedule}"
-    
-    def get_schedule(self):
-        return self.schedule
-    
-    def perform_job(self, job: Job):
-        self.jobs_performed += 1
-        end_times_of_precedent_jobs = [prec_job.time_completed for prec_job in job.dependencies]
-        # print(self.id,end_times_of_precedent_jobs, self.current_job_end_time)
-        start_time : float = max(end_times_of_precedent_jobs + [self.current_job_end_time])
-        end_time: float  = start_time + job.get_processing_time()
-        self.current_job_end_time = end_time
-        job.set_time_completed(end_time)
-        # print(self.id, job)
-        self.schedule.append((job, start_time, end_time))
-        
-    def completion_time(self):
-        return self.current_job_end_time
-    
 
 ## Importing from json file and preprocessing
 def convert_to_seconds(ch):
@@ -91,7 +32,7 @@ def create_DAG(joblist : list[Job]):
             G.add_edge(precendent_job, job)
     return G
 
-DAG = create_DAG(import_graph("testGraph.json"))
+DAG = create_DAG(import_graph("Graphs/testGraph.json"))
 print(DAG)
 
 
