@@ -2,8 +2,7 @@ class Job:
     num: int = 0
     processing_time: float = 0.0
     dependencies: list = []
-    time_completed: float = None
-    
+        
     def __init__(self, num, processing_time, dependencies):
         self.num = num
         self.processing_time = processing_time
@@ -14,7 +13,7 @@ class Job:
         
     def __repr__(self):
         return f"Job {self.num}"
-    
+        
     def get_processing_time(self):
         return self.processing_time
     

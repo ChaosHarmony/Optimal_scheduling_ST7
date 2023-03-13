@@ -36,12 +36,12 @@ DAG = create_DAG(import_graph("Graphs/testGraph.json"))
 print(DAG)
 
 
+#### ACO - Elitist Ants let's capture all of this into one function
+
 # Mappings
 index_to_jobs_mapping = {idx: job for idx, job in enumerate(DAG.nodes())}
 jobs_to_index_mapping = {job: idx for idx, job in enumerate(DAG.nodes())}
 
-
-#### ACO
 
 # Define the problem instance
 num_machines = 2
@@ -101,9 +101,15 @@ def probabilites_construction(current_node: Job = None, available_nodes: list[Jo
 best_schedule = None
 best_makespan = np.inf 
 
+
+
+
 for it in range(num_iterations):
     # Create a set of ant solutions
     ant_solutions: list[(list[Job], list[Machine])] = []
+    # Completed Job Dict to fix bug
+    # [Job] : {Node: ("Machine", "start_time", "end_time"))
+    completed_jobs = {}
     for ant in range (num_ants):
         machines = [Machine(i+1) for i in range(num_machines)]
         visited_jobs = set()
@@ -112,7 +118,7 @@ for it in range(num_iterations):
         current_node = np.random.choice(available_nodes, p=probabilites_construction(None, available_nodes))
         visited_jobs.add(current_node)
         machines.sort(key=lambda machine : machine.current_job_end_time)
-        machines[0].perform_job(current_node)
+        machines[0].perform_job(current_node, completed_jobs)
         ant_path = [current_node]
         available_nodes.remove(current_node)
         
@@ -123,14 +129,14 @@ for it in range(num_iterations):
             next_node = np.random.choice(available_nodes, p=probabilites_construction(current_node, available_nodes))
             
             machines.sort(key = lambda machine : machine.current_job_end_time)
-            machines[0].perform_job(next_node)
+            machines[0].perform_job(next_node, completed_jobs)
             visited_jobs.add(next_node)
             ant_path.append(next_node)
             available_nodes.remove(next_node)
             current_node = next_node
         
-        for job in jobs_to_index_mapping.keys():
-            job.reset_time_completed()
+        print(completed_jobs)
+        completed_jobs.clear()
             
         ant_solutions.append((ant_path, machines))
     # print(list(map(lambda x: makespan(x[1]), ant_solutions)))
@@ -151,7 +157,7 @@ for it in range(num_iterations):
         best_schedule = best_ant_solution[1]
 
 print(best_makespan)
-print(best_schedule)
+print(list(map(lambda x: x.schedule, best_schedule)))
 # print(pheromone_matrix)
 
 # print(ant_solutions)
