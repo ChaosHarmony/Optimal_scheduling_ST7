@@ -100,7 +100,7 @@ def generate_complete_graph(graph):
 ##############              Availibility set                   ####################
 ###################################################################################
 
-
+# WILL BE MUTED AND REPLACED BY A SIMPLER FUNC
 def is_available(graph: nx.DiGraph, node: int or str, visited_nodes: list):
     """
     Tells if node is accessable with the list of visited_nodes, with precedence constraints //
@@ -113,17 +113,30 @@ def is_available(graph: nx.DiGraph, node: int or str, visited_nodes: list):
         if not (parent in visited_nodes):
             return False
     return True
+#########
 
 
-def available_set_of_node(graph: nx.DiGraph, graph_nodes: list, visited_node: list):
+def new_available_list_of_node(graph: nx.DiGraph, visited_nodes: list, chosen_node: int):
     """
-    Create a set of every accessible nodes from the visited nodes
+    graph : is the directed graph of the jobs (with precedencies constraints)
+    visited_nodes : list of already visited node
+
+    Create list of the unlocked nodes
     """
-    available = set()
-    for node in graph_nodes:
-        if is_available(graph, node, visited_node):
-            available.add(node)
-    return available
+    new_reachable_nodes = []
+    # take a child of that node -> candidates to be add in the available list
+    for node in graph.successors(chosen_node):
+        is_reachable = True
+
+        # for loop on parents of that child node -> if parent of child not in the available list -> child not reachable
+        for parent in graph.predecessors(node):
+            if not parent in visited_nodes:
+                is_reachable = False
+                # break statment to exit the parenting loop because we need only one parent to not be available...
+                break
+        if is_reachable:
+            new_reachable_nodes.append(node)
+    return new_reachable_nodes
 
 
 def get_weight_nodes(graph: nx.DiGraph, graph_nodes: list):
@@ -160,10 +173,10 @@ def rank_reachable_nodes(selected_ant, colony):
     curr_node = selected_ant.solution[-1]
     graph = colony.directed_graph
     nodes = list(graph)
-    reachable_nodes = list(available_set_of_node(
-        graph, nodes, selected_ant.solution))
-    ranked_nodes = np.random.choice(reachable_nodes, p=probability_construction(
-        curr_node, reachable_nodes, get_weight_nodes(graph, nodes), colony))
+    selected_ant.update_reachable_nodes(
+        new_available_list_of_node(graph, selected_ant.solution, curr_node))
+    ranked_nodes = np.random.choice(selected_ant.reachable_nodes, p=probability_construction(
+        curr_node, selected_ant.reachable_nodes, get_weight_nodes(graph, nodes), colony))
     return ranked_nodes
 
 
@@ -255,29 +268,23 @@ if __name__ == "__main__":
 
     print('=========================================')
     print("starting test of advailability")
-    visited_node = []
-    start_set = available_set_of_node(
-        small_graph, small_graph_nodes, visited_node)
-    print("Used visited node list :", visited_node)
-    print("We should only have start in the returned set :", start_set,
-          "   then the test is good :", start_set == set(["start"]))
     visited_node = ["start"]
-    start_set = available_set_of_node(
-        small_graph, small_graph_nodes, visited_node)
+    new_set = new_available_list_of_node(
+        small_graph, visited_node, chosen_node='start')
     print("\nUsed visited node list :", visited_node)
-    print("We should only have 1 in the returned set :", start_set,
-          "   then the test is good :", start_set == set([1]))
+    print("We should only have 1 in the returned set :", new_set,
+          "   then the test is good :", new_set == [1])
     visited_node = ["start", 1]
-    start_set = available_set_of_node(
-        small_graph, small_graph_nodes, visited_node)
+    start_set = new_available_list_of_node(
+        small_graph, visited_node, 1)
     print("\nUsed visited node list :", visited_node)
-    print("We should only have 2,3,4 in the returned set :", start_set,
-          "   then the test is good :", start_set == set([2, 3, 4]))
+    print("We should only have 2,3,4 in the returned list :", start_set,
+          "   then the test is good :", start_set == [2, 3, 4])
     visited_node = ["start", 1, 2, 3, 4, 5, 7, 9]
-    start_set = available_set_of_node(
-        small_graph, small_graph_nodes, visited_node)
+    start_set = new_available_list_of_node(
+        small_graph, visited_node, 9)
     print("\nUsed visited node list :", visited_node)
-    print("The returned set is : ", start_set)
+    print("The returned list is : ", start_set)
     print("end is not in the returned set :", not "end" in start_set)
 
     print("==========================================================")

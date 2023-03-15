@@ -8,6 +8,7 @@ import time
 Transforms the graph so ants can walk on it
 """
 
+
 def convert_to_seconds(ch):
     hh, mm, ss = ch.split(':')
     return 3600*int(hh)+60*int(mm)+float(ss)
@@ -76,7 +77,7 @@ if __name__ == "__main__":
 
     print("TESTING RANGE")
     print("===============================================")
-    graph_path = "./Graphs/smallRandom.json"
+    graph_path = "./Graphs/smallComplex.json"
     print("getting graph from ", graph_path, " ...")
     graph, graph_nodes = extract_directed_graph(graph_path)
 
@@ -117,5 +118,6 @@ if __name__ == "__main__":
         nx.draw_networkx(graph, arrows=True)
         plt.show()
         print("end view...")
+    print(len(new_nodes))
 
     print("END")

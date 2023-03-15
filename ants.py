@@ -6,14 +6,18 @@ import itertools
 class Ant():
 
     def __init__(self, starting_point, objectif_point):
-        self.solution = [starting_point]
+        self.solution = []
         self.objectif = objectif_point
+        self.reachable_nodes = [starting_point]
 
     def is_visited(self, node):
         return node in self.solution
 
     def add_node(self, node):
         self.solution.append(node)
+
+    def update_reachable_nodes(self, list_node):
+        self.reachable_nodes.extend(list_node)
 
     def has_finished(self):
         return self.objectif == self.solution[-1]
@@ -26,7 +30,7 @@ class Ant_TGE(Ant):
     def __init__(self, starting_point, objectif_point, nb_machines):
         super().__init__(starting_point, objectif_point)
         self.nb_machines = nb_machines
-        self.machines_time_track = np.zeros((1, nb_machines), dtype=float)
+        self.machines_time_track = np.zeros((nb_machines, 1), dtype=float)
         self.affected_machine = []
 
     def machine_available(self):
@@ -44,7 +48,7 @@ class Ant_TGE(Ant):
         possible_machines = []
         for i in range(self.nb_machines):
             ad = self.machine_available()
-            if ad[0][i]:
+            if ad[i]:
                 possible_machines.append(i)
         return np.random.choice(possible_machines)
 

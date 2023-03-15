@@ -8,8 +8,9 @@ def run(colony: AC.AntColony):
     """
     Works only with ant_TGE
     """
-
+    round = 1
     while not colony.has_finished():
+        print('round = ', round)
         for i in range(colony.n_ants):
             ant = colony.colony_list[i]
 
@@ -24,7 +25,8 @@ def run(colony: AC.AntColony):
             ant.add_node(choosen_node)
             time_elapsed = colony.directed_graph.nodes[choosen_node]['process_time']
             ant.add_machine(chosen_machine)
-            ant.update_machine_time_track(chosen_machine-1, time_elapsed)
+            ant.update_machine_time_track(chosen_machine, time_elapsed)
+        round += 1
 
 
 def get_ant_path(ant_solution: list):
@@ -71,7 +73,7 @@ def main(n_iteration, graph_path, n_ant, n_machines):
 
     ant_list = [ants.Ant_TGE('start', "end", n_machines) for i in range(n_ant)]
 
-    colony = AC.AntColony(direct_graph, ant_list, 400, 0.1, 400, 2, 1)
+    colony = AC.AntColony(direct_graph, ant_list, .3, 0.2, .3, 1, 2)
     print("Pheromon init")
     colony.init_pheromones()
 
@@ -91,6 +93,6 @@ def main(n_iteration, graph_path, n_ant, n_machines):
     return result_dict
 
 
-result = main(10, './Graphs/smallRandom.json', 10, 2)
+result = main(10, './Graphs/smallComplex.json', 10, 16)
 print("result = ", result)
 print("solution of ant 10 :", result[10].solution)
