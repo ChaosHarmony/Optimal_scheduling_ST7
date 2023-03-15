@@ -47,7 +47,7 @@ def probabilites_construction(alpha: float, beta: float, eta: np.array, pheromon
     return available_probabilites
 
 
-def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10, alpha: float = 1.0, beta: float = 5.0, evaporation_rate: float = 0.5, q: float = 1.0, num_iterations: int = 100):
+def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10, alpha: float = 1.0, beta: float = 2.0, evaporation_rate: float = 0.2, q: float = 1.0, num_iterations: int = 100):
     '''
     graph : directed graph
     num_machines : number of machines given by the problem
@@ -76,8 +76,8 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
     best_global_schedule = None
     best_global_makespan = np.inf
 
-    #print("Eta", eta)
-    #print("Initial Pheormone Matrix",pheromone_matrix)
+    # print("Eta", eta)
+    # print("Initial Pheormone Matrix",pheromone_matrix)
 
     iterations_results = {}
 
@@ -124,36 +124,31 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
 
             completed_jobs.clear()
             ant_solutions.append((ant_path, machines))
-
-            #print(f'Iteration {it}: Ant {ant}', pheromone_matrix)
-
+            
             current_makespan = makespan(machines)
 
             if current_makespan < best_it_makespan:
                 best_it_makespan = current_makespan
                 best_it_schedule = machines
-
             if current_makespan < best_global_makespan:
                 best_global_makespan = current_makespan
                 best_global_schedule = machines
-
-        iterations_results[it+1] = {"Makespan": best_it_makespan,
-                                    "Schedule": best_it_makespan}
-        # About here each process know which ant is the best
-        # computation of pheromon laying
-        # MPI allgather
+        
+        
         # Updating the Pheromone Matrix after each ant tour
         pheromone_matrix *= (1-evaporation_rate)
-        for i in range(len(ant_path) - 1):
-            for solution in ant_solutions:
-                ant_path = solution[0]
-                pheromone_matrix[jobs_to_index_mapping[ant_path[i]],
-                                 jobs_to_index_mapping[ant_path[i+1]]] += q/makespan(machines)
+        for ant in ant_solutions:
+            for i in range(len(ant[0]) - 1):
+                pheromone_matrix[jobs_to_index_mapping[ant[0][i]],
+                            jobs_to_index_mapping[ant[0][i+1]]] += q/makespan(machines)
+
+        # print(f'Iteration {it}:', pheromone_matrix)
+        
+        iterations_results[it+1] = {"Makespan": best_it_makespan, "Schedule": best_it_makespan}
 
     return best_global_makespan, best_global_schedule, iterations_results
 
-
-def ACO_elite_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 100, alpha: float = 1.0, beta: float = 5.0, evaporation_rate: float = 0.5, q: float = 1.0, num_iterations: int = 100):
+def ACO_elite_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10, alpha: float = 1.0, beta: float = 2.0, evaporation_rate: float = 0.2, q: float = 1.0, num_iterations: int = 100):
     '''
     graph : directed graph
     num_machines : number of machines given by the problem
