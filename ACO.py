@@ -17,10 +17,10 @@ def get_initial_jobs(graph: nx.DiGraph) -> list[Job]:
     return list(map(lambda x: x[0], filter(lambda x: x[1] == 0, graph.in_degree())))
 
 
-def get_next_avaiable_jobs(graph: nx.DiGraph, visited_jobs: set[Job], completed_job: Job) -> list[Job]:
-    successors: list[Job] = list(graph.successors(completed_job))
+def get_next_available_jobs(graph: nx.DiGraph, visited_jobs: set[Job], completed_job: Job) -> list[Job]:
     available_jobs = []
-    for successor in successors:
+    # iterates over the successor of the completed_job
+    for successor in graph.successors(completed_job):
         for parent in graph.predecessors(successor):
             if parent not in visited_jobs:
                 break
@@ -53,7 +53,7 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
     num_machines : number of machines given by the problem
     num_ants : set the number of ants inside each colony
     alpha : exponent coefficient for the pheromons
-    beta : exponent coefficient for prior knowledge / heuristic
+    beta : exponent coefficient for prior knowledge / visibility
     evaporation_rate : should be between 0 and 1, rate at which the pheronom trail lessen
     q : pheromon laying coefficient
     num_iteration : number of time the colony will run the graph.
@@ -102,7 +102,7 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
             available_nodes.remove(current_node)
 
             while len(visited_jobs) < len(graph):
-                available_nodes += get_next_avaiable_jobs(
+                available_nodes += get_next_available_jobs(
                     graph=graph, visited_jobs=visited_jobs, completed_job=current_node)
                 next_node = np.random.choice(
                     available_nodes,
