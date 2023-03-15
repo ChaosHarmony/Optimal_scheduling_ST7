@@ -9,7 +9,11 @@ from ACO import *
 from graph_functions import *
 
 
-DAG = create_DAG(import_graph("Graphs/MediumComplex.json"))
+DAG = create_DAG(import_graph("Graphs/smallComplex.json"))
 print(DAG)
+best_makespan, best_schedule, iterations_results = ACO_basic_ants(graph=DAG, num_iterations = 5)
 
-print(ACO_basic_ants(graph=DAG, num_iterations=5)[0]/3600)
+print(best_makespan/3600)
+print(list(map(lambda x: x["Makespan"], iterations_results.values())))
+plt.plot(iterations_results.keys(), list(map(lambda x: x["Makespan"], iterations_results.values())))
+plt.show()
