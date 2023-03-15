@@ -90,9 +90,12 @@ def main(n_iteration, graph_path, n_ant, n_machines):
 
     print("END")
 
-    return result_dict
+    return result_dict, colony
 
 
 result = main(10, './Graphs/smallComplex.json', 10, 16)
+
 print("result = ", result)
 print("solution of ant 10 :", result[10].solution)
+print(result[10].affected_machine, result[10].machines_time_track)
+print(go.path_cost(result[10], colony))
