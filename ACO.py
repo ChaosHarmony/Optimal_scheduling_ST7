@@ -226,7 +226,7 @@ def ACO_elite_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
             
         
         best_ant_index = np.argmin(list(map(lambda x: makespan(x[1]), ant_solutions)))
-        best_ant_solution = ant_solutions[best_ant_solution]
+        best_ant_solution = ant_solutions[best_ant_index]
         
         #Updating the Pheromone Matrix using the best ant in each colony
         pheromone_matrix *= (1-evaporation_rate)
