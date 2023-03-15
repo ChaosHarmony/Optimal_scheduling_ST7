@@ -4,7 +4,6 @@ import json
 import matplotlib.pyplot as plt
 from Job import Job
 from Machine import Machine
-from queue import PriorityQueue
 
 ## Importing from json file and preprocessing
 def convert_to_seconds(ch):
@@ -53,7 +52,7 @@ alpha = 1.0  # controls the importance of pheromone
 beta = 5.0  # controls the importance of heuristic information
 evaporation_rate = 0.5
 q = 1.0  # pheromone deposit amount
-num_iterations = 100
+num_iterations = 1
 
 # objective function
 def makespan(machines: list[Machine]) -> float:
@@ -95,14 +94,10 @@ def probabilites_construction(current_node: Job = None, available_nodes: list[Jo
     available_probabilites /=np.sum(available_probabilites)
 
     return available_probabilites
-    
 
 # Apply the ACO algorithmn
 best_schedule = None
 best_makespan = np.inf 
-
-
-
 
 for it in range(num_iterations):
     # Create a set of ant solutions
@@ -135,7 +130,7 @@ for it in range(num_iterations):
             available_nodes.remove(next_node)
             current_node = next_node
         
-        print(completed_jobs)
+        # print(completed_jobs)
         completed_jobs.clear()
             
         ant_solutions.append((ant_path, machines))
@@ -147,6 +142,7 @@ for it in range(num_iterations):
     best_ant_solution = ant_solutions[best_ant_index]
     # print(best_ant_index, best_ant_solution)
     pheromone_matrix *= (1-evaporation_rate)
+    print(best_ant_solution[0])
     for i in range(len(best_ant_solution[0])-1):
         if DAG.has_edge(best_ant_solution[0][i], best_ant_solution[0][i+1]):
             pheromone_matrix[jobs_to_index_mapping[best_ant_solution[0][i]], jobs_to_index_mapping[best_ant_solution[0][i+1]]] += q/makespan(best_ant_solution[1])

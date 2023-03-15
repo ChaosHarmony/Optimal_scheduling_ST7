@@ -11,8 +11,8 @@ class Machine:
         self.schedule = []
     def __repr__(self):
         # return f"M{self.id}: {list(map(lambda x: x[0], self.schedule))}"
-        # return f"M{self.id}: {self.schedule}"
-        return f"M{self.id}"
+        return f"M{self.id}: {self.schedule}"
+        # return f"M{self.id}"
     
     def get_schedule(self):
         return self.schedule
