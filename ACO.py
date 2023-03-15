@@ -91,7 +91,7 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
 
         best_it_schedule = None
         best_it_makespan = np.inf
-
+        # MPI send ish
         for ant in range(num_ants):
             machines = [Machine(i+1) for i in range(num_machines)]
             visited_jobs = set()
@@ -125,12 +125,6 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
             completed_jobs.clear()
             ant_solutions.append((ant_path, machines))
 
-            # Updating the Pheromone Matrix after each ant tour
-            pheromone_matrix *= (1-evaporation_rate)
-            for i in range(len(ant_path) - 1):
-                pheromone_matrix[jobs_to_index_mapping[ant_path[i]],
-                                 jobs_to_index_mapping[ant_path[i+1]]] += q/makespan(machines)
-
             #print(f'Iteration {it}: Ant {ant}', pheromone_matrix)
 
             current_makespan = makespan(machines)
@@ -145,11 +139,21 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
 
         iterations_results[it+1] = {"Makespan": best_it_makespan,
                                     "Schedule": best_it_makespan}
+        # About here each process know which ant is the best
+        # computation of pheromon laying
+        # MPI allgather
+        # Updating the Pheromone Matrix after each ant tour
+        pheromone_matrix *= (1-evaporation_rate)
+        for i in range(len(ant_path) - 1):
+            for solution in ant_solutions:
+                ant_path = solution[0]
+                pheromone_matrix[jobs_to_index_mapping[ant_path[i]],
+                                 jobs_to_index_mapping[ant_path[i+1]]] += q/makespan(machines)
 
     return best_global_makespan, best_global_schedule, iterations_results
 
 
-def ACO_elite_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10, alpha: float = 1.0, beta: float = 5.0, evaporation_rate: float = 0.5, q: float = 1.0, num_iterations: int = 100):
+def ACO_elite_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 100, alpha: float = 1.0, beta: float = 5.0, evaporation_rate: float = 0.5, q: float = 1.0, num_iterations: int = 100):
     '''
     graph : directed graph
     num_machines : number of machines given by the problem
