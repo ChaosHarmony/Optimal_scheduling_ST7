@@ -8,5 +8,7 @@ from ACO import *
 from graph_functions import *
 
 
-DAG = create_DAG(import_graph("Graphs/testGraph.json"))
-print(ACO_basic_ants(graph=DAG, num_iterations = 2))
+DAG = create_DAG(import_graph("Graphs/MediumComplex.json"))
+print(DAG)
+
+print(ACO_basic_ants(graph=DAG, num_iterations=5)[0]/3600)
