@@ -88,9 +88,13 @@ def main(n_iteration, graph_path, n_ant, n_machines):
 
     print("END")
 
-    return result_dict
+    return result_dict, colony
 
 
-result = main(10, './Graphs/smallRandom.json', 10, 2)
+# result = main(10, './Graphs/smallRandom.json', 10, 2)
+result, colony = main(
+    10, 'C:/Users/Hinnovis/Desktop/ST7/Task_Optim_Aneo/task_optim_Aneo/Optimal_scheduling_ST7/Graphs/testGraph.json', 10, 2)
 print("result = ", result)
 print("solution of ant 10 :", result[10].solution)
+print(result[10].affected_machine, result[10].machines_time_track)
+print(go.path_cost(result[10], colony))
