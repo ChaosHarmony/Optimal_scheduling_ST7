@@ -1,9 +1,20 @@
 import numpy as np
+from mpi4py import MPI
 import networkx as nx
 import json
 import matplotlib.pyplot as plt
 from Job import Job
 from Machine import Machine
+
+# Establishing communication
+comm = MPI.COMM_WORLD
+
+
+def test_func_MPI():
+    rank = comm.Get_rank()
+    size = comm.Get_size()
+    print("Hello from process {0} out of {1}".format(rank, size))
+
 
 # Objective Functions
 
@@ -124,7 +135,7 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
 
             completed_jobs.clear()
             ant_solutions.append((ant_path, machines))
-            
+
             current_makespan = makespan(machines)
 
             if current_makespan < best_it_makespan:
@@ -133,20 +144,21 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
             if current_makespan < best_global_makespan:
                 best_global_makespan = current_makespan
                 best_global_schedule = machines
-        
-        
+
         # Updating the Pheromone Matrix after each ant tour
         pheromone_matrix *= (1-evaporation_rate)
         for ant in ant_solutions:
             for i in range(len(ant[0]) - 1):
                 pheromone_matrix[jobs_to_index_mapping[ant[0][i]],
-                            jobs_to_index_mapping[ant[0][i+1]]] += q/makespan(machines)
+                                 jobs_to_index_mapping[ant[0][i+1]]] += q/makespan(machines)
 
         # print(f'Iteration {it}:', pheromone_matrix)
-        
-        iterations_results[it+1] = {"Makespan": best_it_makespan, "Schedule": best_it_makespan}
+
+        iterations_results[it+1] = {"Makespan": best_it_makespan,
+                                    "Schedule": best_it_makespan}
 
     return best_global_makespan, best_global_schedule, iterations_results
+
 
 def ACO_elite_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10, alpha: float = 1.0, beta: float = 2.0, evaporation_rate: float = 0.2, q: float = 1.0, num_iterations: int = 100):
     '''
@@ -245,3 +257,7 @@ def ACO_elite_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
             best_global_schedule = best_ant_solution[1]
 
     return best_global_makespan, best_global_schedule, iterations_results
+
+
+if __name__ == "__main__":
+    test_func_MPI()
