@@ -1,7 +1,5 @@
 import numpy as np
 import networkx as nx
-import json
-import matplotlib.pyplot as plt
 from Job import Job
 from Machine import Machine
 
