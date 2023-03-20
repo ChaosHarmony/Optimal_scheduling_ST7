@@ -1,8 +1,6 @@
 import numpy as np
 from mpi4py import MPI
 import networkx as nx
-import json
-import matplotlib.pyplot as plt
 from Job import Job
 from Machine import Machine
 
