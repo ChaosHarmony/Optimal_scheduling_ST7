@@ -1,14 +1,22 @@
 import numpy as np
 from mpi4py import MPI
 import networkx as nx
+import json
+import matplotlib.pyplot as plt
 from Job import Job
 from Machine import Machine
+from copy import copy
 
 # Establishing communication
 comm = MPI.COMM_WORLD
+# MPI starts here
+comm_size = comm.Get_size()
+rank = comm.Get_rank()
 
 
 def test_func_MPI():
+    # Establishing communication
+    comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     size = comm.Get_size()
     print("Hello from process {0} out of {1}".format(rank, size))
@@ -70,7 +78,9 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
     returns : [best_makespan, best_schedule]
 
     '''
-
+    local_num_ant = num_ants//comm_size
+    print("Hello from process {0} out of {1}. I'm working on {2} ants".format(
+        rank, comm_size, local_num_ant))
     # Mappings from Job to Indices of Phermonone/Visibility Matrices
     index_to_jobs_mapping = {idx: job for idx, job in enumerate(graph.nodes())}
     jobs_to_index_mapping = {job: idx for idx, job in enumerate(graph.nodes())}
@@ -88,24 +98,26 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
     # print("Eta", eta)
     # print("Initial Pheormone Matrix",pheromone_matrix)
 
-    iterations_results = {}
+    local_iterations_results = {}
 
     for it in range(num_iterations):
         # Create a list of tuples for ant solutions
-        ant_solutions: list[(list[Job], list[Machine])] = []
+        local_ant_solutions: list[(list[Job], list[Machine])] = []
 
         # Completed Job dict to fix scheudling bug
         # [Job] : {Node: ("Machine", "start_time", "end_time"))
         completed_jobs = {}
+        # Local process best ant :
+        best_local_schedule = None
+        best_local_makespan = np.inf
 
-        best_it_schedule = None
-        best_it_makespan = np.inf
-        # MPI send ish
-        for ant in range(num_ants):
+        for ant in range(local_num_ant):
+            # initiate variables
             machines = [Machine(i+1) for i in range(num_machines)]
             visited_jobs = set()
             available_nodes = get_initial_jobs(graph=graph)
 
+            # choose the node "start"
             current_node = np.random.choice(available_nodes, p=probabilites_construction(
                 alpha, beta, eta, pheromone_matrix, jobs_to_index_mapping, None, available_nodes))
             visited_jobs.add(current_node)
@@ -114,6 +126,8 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
             machines[0].perform_job(current_node, completed_jobs)
             ant_path = [current_node]
             available_nodes.remove(current_node)
+
+            # starting tour
 
             while len(visited_jobs) < len(graph):
                 available_nodes += get_next_available_jobs(
@@ -131,31 +145,46 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
                 available_nodes.remove(next_node)
                 current_node = next_node
 
+            #everything is done
             completed_jobs.clear()
-            ant_solutions.append((ant_path, machines))
+            # get solution localized
+            local_ant_solutions.append((ant_path, machines))
+            # get the makespan localized
+            local_current_makespan = makespan(machines)
 
-            current_makespan = makespan(machines)
+            # Update best local ant
+            if local_current_makespan < best_local_makespan:
+                best_local_makespan = local_current_makespan
+                best_local_schedule = copy(machines)
+            if local_current_makespan < best_global_makespan:
+                best_global_makespan = local_current_makespan
+                best_global_schedule = copy(machines)
+            # no more in the ant loop
+            # every local ants have done their tour
 
-            if current_makespan < best_it_makespan:
-                best_it_makespan = current_makespan
-                best_it_schedule = machines
-            if current_makespan < best_global_makespan:
-                best_global_makespan = current_makespan
-                best_global_schedule = machines
-
-        # Updating the Pheromone Matrix after each ant tour
+        # Updating the Pheromone Matrix after each ant
+        # Evaporation affect all process the same...
         pheromone_matrix *= (1-evaporation_rate)
-        for ant in ant_solutions:
+
+        # local addition of ants' choice
+        local_pheromone_addition_matrix = np.zeros_like(pheromone_matrix)
+        for ant in local_ant_solutions:
             for i in range(len(ant[0]) - 1):
-                pheromone_matrix[jobs_to_index_mapping[ant[0][i]],
-                                 jobs_to_index_mapping[ant[0][i+1]]] += q/makespan(machines)
+                local_pheromone_addition_matrix[jobs_to_index_mapping[ant[0][i]],
+                                                jobs_to_index_mapping[ant[0][i+1]]] += q/makespan(machines)
+
+        # addition of all resulting matrix
+        global_addition_matrix = np.zeros_like(local_pheromone_addition_matrix)
+        comm.Allreduce(
+            local_pheromone_addition_matrix, global_addition_matrix, op=MPI.SUM)
+        pheromone_matrix += global_addition_matrix
 
         # print(f'Iteration {it}:', pheromone_matrix)
 
-        iterations_results[it+1] = {"Makespan": best_it_makespan,
-                                    "Schedule": best_it_makespan}
-
-    return best_global_makespan, best_global_schedule, iterations_results
+        # LOCAL RESULT FOR LOCAL SENDING
+        local_iterations_results[it+1] = {"Makespan": best_local_makespan,
+                                          "Schedule": best_local_schedule}
+    return best_global_makespan, best_global_schedule, local_iterations_results
 
 
 def ACO_elite_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10, alpha: float = 1.0, beta: float = 2.0, evaporation_rate: float = 0.2, q: float = 1.0, num_iterations: int = 100):
@@ -258,4 +287,5 @@ def ACO_elite_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
 
 
 if __name__ == "__main__":
+
     test_func_MPI()

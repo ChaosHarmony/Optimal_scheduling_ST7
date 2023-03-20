@@ -8,7 +8,10 @@ from Machine import Machine
 from ACO import *
 from graph_functions import *
 from time import process_time
+from mpi4py import MPI
 
+comm = MPI.COMM_WORLD
+print("hello main.py from : ", comm.Get_rank())
 
 DAG = create_DAG(import_graph("Graphs/smallRandom.json"))
 print(DAG)
@@ -19,17 +22,29 @@ print(DAG)
 print("Basic Ants")
 
 basic_ant_start = process_time()
-best_makespan, best_schedule, iterations_results = ACO_basic_ants(
+local_best_makespan, local_best_schedule, local_iterations_results = ACO_basic_ants(
     graph=DAG, num_ants=1000, num_iterations=100)
 basic_ant_end = process_time()
-print(best_makespan/3600)
+print("best makepan of process #{0} : {1}h ".format(
+    comm.Get_rank(), local_best_makespan))
 # print(best_schedule)
-print(f"Elapsed time (CPU): {basic_ant_end-basic_ant_start}s")
+print(
+    f"Elapsed time (CPU) for process#{comm.Get_rank()}: {basic_ant_end-basic_ant_start}s")
 # print(list(map(lambda x: x["Makespan"], iterations_results.values())))
-plt.plot(iterations_results.keys(), list(
-    map(lambda x: x["Makespan"], iterations_results.values())))
-plt.show()
+iterations_results_list = comm.gather(local_iterations_results, root=0)
+if rank == 0:
+    print("gathering of final solutions")
+    iterations_results: dict = iterations_results_list[0]
+    for i in range(1, comm.Get_size()):
+        for key in iterations_results.keys():
+            if iterations_results_list[i][key]["Makespan"] < iterations_results[key]["Makespan"]:
+                iterations_results[key] = iterations_results_list[i][key]
 
+    plt.plot(iterations_results.keys(), list(
+        map(lambda x: x["Makespan"], iterations_results.values())))
+    plt.show()
+
+'''
 print("Elite Ants")
 elite_ant_start = process_time()
 best_makespan, best_schedule, iterations_results = ACO_elite_ants(
@@ -42,3 +57,4 @@ print(f"Elapsed time (CPU): {elite_ant_end-elite_ant_start}s")
 
 
 # plt.plot(iterations_results.keys(), list(map(lambda x: x["Makespan"], iterations_results.values())))
+'''
