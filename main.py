@@ -32,3 +32,6 @@ parameters = {
     # "child and process"
 
 }
+
+
+resolution(parameters)
