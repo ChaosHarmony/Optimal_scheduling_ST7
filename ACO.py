@@ -1,4 +1,5 @@
 import numpy as np
+from visibility_func import procces_visibilty_func
 from mpi4py import MPI
 import networkx as nx
 import json
@@ -64,7 +65,7 @@ def probabilites_construction(alpha: float, beta: float, eta: np.array, pheromon
     return available_probabilites
 
 
-def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10, alpha: float = 1.0, beta: float = 2.0, evaporation_rate: float = 0.2, q: float = 1.0, num_iterations: int = 100):
+def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10, alpha: float = 1.0, beta: float = 2.0, evaporation_rate: float = 0.2, q: float = 1.0, visibility_function=procces_visibilty_func, num_iterations: int = 100):
     '''
     graph : directed graph
     num_machines : number of machines given by the problem
@@ -90,7 +91,7 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
     eta = np.zeros((len(graph), len(graph)))
     for i in range(len(graph)):
         for j in range(len(graph)):
-            eta[i, j] = 1 / index_to_jobs_mapping[j].get_processing_time()
+            eta[i, j] = 1 / visibility_function(index_to_jobs_mapping[j])
 
     best_global_schedule = None
     best_global_makespan = np.inf
@@ -160,6 +161,10 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
                 best_global_makespan = local_current_makespan
                 best_global_schedule = copy(machines)
             # no more in the ant loop
+            # LOCAL RESULT FOR LOCAL SENDING
+            local_ant_dict = {ant: {"Makespan": local_current_makespan,
+                                    "Schedule": copy(machines)}}
+            local_iterations_results[it+1] = local_ant_dict
             # every local ants have done their tour
 
         # Updating the Pheromone Matrix after each ant

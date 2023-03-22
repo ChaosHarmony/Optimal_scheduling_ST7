@@ -14,7 +14,7 @@ print("\n=======================================================================
 comm = MPI.COMM_WORLD
 print("hello main.py from : ", comm.Get_rank(), ' \n')
 
-DAG = create_DAG(import_graph("Graphs/smallRandom.json"))
+DAG = create_DAG(import_graph("Graphs/mediumRandom.json"))
 print(DAG)
 
 # give result in hour.
