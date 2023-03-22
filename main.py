@@ -2,7 +2,7 @@ from intermediate import resolution
 
 parameters = {
     "DAG_path":
-    "./Graphs/smallComplex.json",
+    "./Graphs/smallRandom.json",
     # "./Graphs/mediumRandom.json",
 
     "Ants type":
@@ -32,11 +32,11 @@ parameters = {
     # "child and process",
 
     # print option :
-    "log scale": True,
+    "log scale": False,
     "time unit":
-    # 's',
-    # 'min',
-    'h',
+    # 1,   #s
+    # 60, #min
+    3600,  # h
 
     "txt results": False
 

@@ -49,8 +49,8 @@ def resolution(parameters):
 # magic here ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         basic_ant_end = process_time()
 
-        print("best makepan of process #{0} : {1}h ".format(
-            comm.Get_rank(), local_best_makespan))
+        print("best makepan of process #{0} : {1} ".format(
+            comm.Get_rank(), local_best_makespan/parameters["time unit"]))
         # print("best schedule of process #{0} : {1} ".format(
         #    comm.Get_rank(), local_best_schedule))
         print(
@@ -58,6 +58,7 @@ def resolution(parameters):
 
         # print(list(map(lambda x: x["Makespan"], iterations_results.values())))
         iterations_results_list = comm.gather(local_iterations_results, root=0)
+        makespan_list = comm.gather(local_best_makespan, root=0)
         print("\n==============================================================================\n")
         if rank == 0:
             print(
@@ -74,8 +75,12 @@ def resolution(parameters):
                 iterations_results[key] = local_ant_dict
             plot_save.plot_save(iterations_results, parameters)
             print(
-                "\n==============================================================================\n")
-        print("\n====================================      END      ===============================\n")
+                "\n============================    FINAL RESULTS   =================================\n")
+
+            print("best makespan : ", min(
+                makespan_list)/parameters["time unit"])
+            print(
+                "\n====================================      END      ===============================\n")
     if parameters["Ants type"] == "Elite Ants":
         print("Elite Ants")
         elite_ant_start = process_time()

@@ -3,7 +3,6 @@ import numpy as np
 
 
 def plot_save(result_dict: dict, parameters: dict):
-    print(result_dict)
     iteration = result_dict.keys()
     max_results = np.empty((parameters['iteration number'],))
     min_results = np.empty((parameters['iteration number'],))
@@ -19,12 +18,7 @@ def plot_save(result_dict: dict, parameters: dict):
             iteration_makespan[ant] = result_dict[iter][ant]['Makespan']
 
         # time unit
-        if parameters["time unit"] == 's':
-            tu = 1
-        elif parameters["time unit"] == 'min':
-            tu = 60
-        elif parameters["time unit"] == 'h':
-            tu = 3600
+        tu = parameters["time unit"]
         # operation
         max_results[iter-1] = max(iteration_makespan)/tu
         min_results[iter-1] = min(iteration_makespan)/tu
@@ -50,8 +44,10 @@ def plot_save(result_dict: dict, parameters: dict):
     # plt.plot(iteration, mean_results-standard_deviation,
     #         color="blue", label="mean - std")
     plt.xlabel("Iterations of ant colony")
-    plt.ylabel("Makespan (s)")
+    plt.ylabel("Makespan (h)")
     plt.title("Optimization of ... with {0} ants and {1} iterations. \n Q = {2}, \rho = {3}, \alpha = {4}, \beta = {5}".format(
         num_ant, parameters['iteration number'], parameters["Q"], parameters["evaporation"], parameters["alpha"], parameters["beta"]))
     plt.legend()
     plt.savefig("./results.png")
+    print('to verify')
+    print('minimum result of last iter:', min_results[-1])

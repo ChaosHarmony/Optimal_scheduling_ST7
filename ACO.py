@@ -165,7 +165,7 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
             # no more in the ant loop
             # LOCAL RESULT FOR LOCAL SENDING
             local_ant_dict[ant] = {"Makespan": local_current_makespan,
-                                   "Schedule": 1}  # copy(machines)}}
+                                   "Schedule": copy(machines)}
             # every local ants have done their tour
 
         local_iterations_results[it+1] = local_ant_dict
