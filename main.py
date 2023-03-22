@@ -2,8 +2,8 @@ from intermediate import resolution
 
 parameters = {
     "DAG_path":
-    # "./Graphs/smallComplex.json",
-    "./Graphs/mediumRandom.json",
+    "./Graphs/smallRandom.json",
+    # "./Graphs/mediumRandom.json",
 
     "Ants type":
     "Basic Ants",
@@ -13,10 +13,10 @@ parameters = {
     "machines number":
     2,
     "ants number":
-    1000,
+    100,
 
     "iteration number":
-    100,
+    10,
 
     # HYPERPARAM
     "alpha":

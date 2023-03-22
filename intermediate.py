@@ -31,24 +31,30 @@ def resolution(parameters):
     DAG = create_DAG(import_graph(parameters["DAG_path"]))
     print(DAG)
 
+    # choosing the right function
+
     visibility_choice(parameters)
 
-    # give result in hour.
     if parameters["Ants type"] == "Basic Ants":
         print("Basic Ants")
 
         basic_ant_start = process_time()
+
         local_best_makespan, local_best_schedule, local_iterations_results = ACO_basic_ants(
             graph=DAG, num_machines=parameters["machines number"], num_ants=parameters[
                 "ants number"], alpha=parameters["alpha"],
             beta=parameters["beta"], evaporation_rate=parameters["evaporation"], q=parameters["Q"], visibility_function=visibility_func,
             num_iterations=parameters["iteration number"])
+# magic here ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         basic_ant_end = process_time()
+
         print("best makepan of process #{0} : {1}h ".format(
             comm.Get_rank(), local_best_makespan))
-        # print(best_schedule)
+        print("best schedule of process #{0} : {1} ".format(
+            comm.Get_rank(), local_best_schedule))
         print(
             f"Elapsed time (CPU) for process#{comm.Get_rank()}: {basic_ant_end-basic_ant_start}s")
+
         # print(list(map(lambda x: x["Makespan"], iterations_results.values())))
         iterations_results_list = comm.gather(local_iterations_results, root=0)
         print("\n==============================================================================\n")
@@ -64,7 +70,7 @@ def resolution(parameters):
 
             plt.plot(iterations_results.keys(), list(
                 map(lambda x: x["Makespan"], iterations_results.values())))
-            plt.show()
+            plt.savefig("./results.png")
             print(
                 "\n==============================================================================\n")
         print("\n====================================      END      ===============================\n")
