@@ -1,0 +1,5 @@
+mpi4py==3.1.4
+matplotlib==3.7.0
+networkx==3.0
+numpy==1.24.2
+azure-batch==13.0.0
