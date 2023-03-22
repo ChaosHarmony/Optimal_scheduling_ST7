@@ -65,7 +65,7 @@ def probabilites_construction(alpha: float, beta: float, eta: np.array, pheromon
     return available_probabilites
 
 
-def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10, alpha: float = 1.0, beta: float = 2.0, evaporation_rate: float = 0.2, q: float = 1.0, visibility_function=procces_visibilty_func, num_iterations: int = 100):
+def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10, alpha: float = 1.0, beta: float = 2.0, evaporation_rate: float = 0.2, q: float = 1.0, q_best: float = 25.0, visibility_function=procces_visibilty_func, num_iterations: int = 100):
     '''
     graph : directed graph
     num_machines : number of machines given by the problem
@@ -74,6 +74,7 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
     beta : exponent coefficient for prior knowledge / visibility
     evaporation_rate : should be between 0 and 1, rate at which the pheronom trail lessen
     q : pheromon laying coefficient
+    q_best : pheromon laying for the best ant found yet. The number represents how many ants she equate to. 
     num_iteration : number of time the colony will run the graph.
 
     returns : [best_makespan, best_schedule]
@@ -158,17 +159,22 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
             # Update best local ant
             if local_current_makespan < best_local_makespan:
                 best_local_makespan = local_current_makespan
-                best_local_schedule = copy(machines)
+                best_local_schedule = machines
             if local_current_makespan < best_global_makespan:
                 best_global_makespan = local_current_makespan
-                best_global_schedule = copy(machines)
+                best_global_schedule = machines
             # no more in the ant loop
             # LOCAL RESULT FOR LOCAL SENDING
             local_ant_dict[ant] = {"Makespan": local_current_makespan,
-                                   "Schedule": copy(machines)}
+                                   "Schedule": machines}
             # every local ants have done their tour
 
-        local_iterations_results[it+1] = local_ant_dict
+        local_iterations_results[it] = local_ant_dict
+
+        # adding a best ant method
+        best_ant_index = np.argmin(
+            list(map(lambda x: makespan(x[1]), local_ant_solutions)))
+        local_best_ant_solution = local_ant_solutions[best_ant_index]
 
         # Updating the Pheromone Matrix after each ant
         # Evaporation affect all process the same...
@@ -180,6 +186,9 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
             for i in range(len(ant[0]) - 1):
                 local_pheromone_addition_matrix[jobs_to_index_mapping[ant[0][i]],
                                                 jobs_to_index_mapping[ant[0][i+1]]] += q/makespan(machines)
+            if ant == local_best_ant_solution:
+                local_pheromone_addition_matrix[jobs_to_index_mapping[ant[0][i]],
+                                                jobs_to_index_mapping[ant[0][i+1]]] += q_best/makespan(machines)
 
         # addition of all resulting matrix
         global_addition_matrix = np.zeros_like(local_pheromone_addition_matrix)

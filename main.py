@@ -27,9 +27,11 @@ parameters = {
     0.2,
     "Q":
     1,
+    "Qbest":
+    1000,
     "visibility function":
-    "process",
-    # "child and process",
+    # "process",
+    "child and process",
 
     # print option :
     "log scale": False,

@@ -20,10 +20,10 @@ def plot_save(result_dict: dict, parameters: dict):
         # time unit
         tu = parameters["time unit"]
         # operation
-        max_results[iter-1] = max(iteration_makespan)/tu
-        min_results[iter-1] = min(iteration_makespan)/tu
-        mean_results[iter-1] = np.mean(iteration_makespan)/tu
-        standard_deviation[iter-1] = np.std(iteration_makespan)/tu
+        max_results[iter] = np.max(iteration_makespan)/tu
+        min_results[iter] = np.min(iteration_makespan)/tu
+        mean_results[iter] = np.mean(iteration_makespan)/tu
+        standard_deviation[iter] = np.std(iteration_makespan)/tu
 
         if parameters['log scale']:
             max_results = np.log10(max_results)
@@ -49,5 +49,3 @@ def plot_save(result_dict: dict, parameters: dict):
         num_ant, parameters['iteration number'], parameters["Q"], parameters["evaporation"], parameters["alpha"], parameters["beta"]))
     plt.legend()
     plt.savefig("./results.png")
-    print('to verify')
-    print('minimum result of last iter:', min_results[-1])

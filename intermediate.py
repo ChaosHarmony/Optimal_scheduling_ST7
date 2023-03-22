@@ -44,7 +44,8 @@ def resolution(parameters):
         local_best_makespan, local_best_schedule, local_iterations_results = ACO_basic_ants(
             graph=DAG, num_machines=parameters["machines number"], num_ants=parameters[
                 "ants number"], alpha=parameters["alpha"],
-            beta=parameters["beta"], evaporation_rate=parameters["evaporation"], q=parameters["Q"], visibility_function=visibility_func,
+            beta=parameters["beta"], evaporation_rate=parameters["evaporation"], q=parameters["Q"],
+            q_best=parameters["Qbest"], visibility_function=visibility_func,
             num_iterations=parameters["iteration number"])
 # magic here ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         basic_ant_end = process_time()
@@ -64,15 +65,15 @@ def resolution(parameters):
             print(
                 "\n==============================================================================\n")
             print("gathering of final solutions")
-            iterations_results: dict = iterations_results_list[0]
-            for key in iterations_results.keys():
+            iterations_results: dict = {}
+            for iter in range(parameters["iteration number"]):
                 ant_number = 0
                 local_ant_dict = {}
                 for ant in range(parameters["ants number"]//comm_size):
-                    for i in range(1, comm.Get_size()):
-                        local_ant_dict[ant_number] = iterations_results_list[i][key][ant]
+                    for i in range(0, comm.Get_size()):
+                        local_ant_dict[ant_number] = iterations_results_list[i][iter][ant]
                         ant_number += 1
-                iterations_results[key] = local_ant_dict
+                iterations_results[iter] = local_ant_dict
             plot_save.plot_save(iterations_results, parameters)
             print(
                 "\n============================    FINAL RESULTS   =================================\n")
