@@ -10,8 +10,9 @@ from graph_functions import *
 from time import process_time
 from mpi4py import MPI
 
+print("\n==============================================================================\n")
 comm = MPI.COMM_WORLD
-print("hello main.py from : ", comm.Get_rank())
+print("hello main.py from : ", comm.Get_rank(), ' \n')
 
 DAG = create_DAG(import_graph("Graphs/smallRandom.json"))
 print(DAG)
@@ -32,7 +33,9 @@ print(
     f"Elapsed time (CPU) for process#{comm.Get_rank()}: {basic_ant_end-basic_ant_start}s")
 # print(list(map(lambda x: x["Makespan"], iterations_results.values())))
 iterations_results_list = comm.gather(local_iterations_results, root=0)
+print("\n==============================================================================\n")
 if rank == 0:
+    print("\n==============================================================================\n")
     print("gathering of final solutions")
     iterations_results: dict = iterations_results_list[0]
     for i in range(1, comm.Get_size()):
@@ -43,7 +46,8 @@ if rank == 0:
     plt.plot(iterations_results.keys(), list(
         map(lambda x: x["Makespan"], iterations_results.values())))
     plt.show()
-
+    print("\n==============================================================================\n")
+    print("\n====================================      END      ===============================\n")
 '''
 print("Elite Ants")
 elite_ant_start = process_time()

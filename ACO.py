@@ -79,7 +79,7 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
 
     '''
     local_num_ant = num_ants//comm_size
-    print("Hello from process {0} out of {1}. I'm working on {2} ants".format(
+    print("Hello from process {0} out of {1}. I'm working with {2} ants".format(
         rank, comm_size, local_num_ant))
     # Mappings from Job to Indices of Phermonone/Visibility Matrices
     index_to_jobs_mapping = {idx: job for idx, job in enumerate(graph.nodes())}
