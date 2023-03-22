@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from ACO import makespan
 
 
 def plot_save(result_dict: dict, parameters: dict):
@@ -8,14 +9,13 @@ def plot_save(result_dict: dict, parameters: dict):
     min_results = np.empty((parameters['iteration number'],))
     mean_results = np.empty((parameters['iteration number'],))
     standard_deviation = np.empty((parameters['iteration number'],))
+    num_ant = len(result_dict[0])
     for iter in iteration:
         # extraction
 
-        ants = result_dict[iter].keys()
-        num_ant = len(ants)
         iteration_makespan = np.empty((num_ant,))
-        for ant in ants:
-            iteration_makespan[ant] = result_dict[iter][ant]['Makespan']
+        for ant in range(num_ant):
+            iteration_makespan[ant] = makespan(result_dict[iter][ant][1])
 
         # time unit
         tu = parameters["time unit"]
@@ -45,7 +45,7 @@ def plot_save(result_dict: dict, parameters: dict):
     #         color="blue", label="mean - std")
     plt.xlabel("Iterations of ant colony")
     plt.ylabel("Makespan (h)")
-    plt.title("Optimization of ... with {0} ants and {1} iterations. \n Q = {2}, \rho = {3}, \alpha = {4}, \beta = {5}".format(
+    plt.title("Optimization of ... with {0} ants and {1} iterations. \n Q = {2}, rho = {3}, alpha = {4}, beta = {5}".format(
         num_ant, parameters['iteration number'], parameters["Q"], parameters["evaporation"], parameters["alpha"], parameters["beta"]))
     plt.legend()
     plt.savefig("./results.png")

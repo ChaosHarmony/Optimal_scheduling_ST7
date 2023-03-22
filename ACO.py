@@ -74,7 +74,7 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
     beta : exponent coefficient for prior knowledge / visibility
     evaporation_rate : should be between 0 and 1, rate at which the pheronom trail lessen
     q : pheromon laying coefficient
-    q_best : pheromon laying for the best ant found yet. The number represents how many ants she equate to. 
+    q_best : pheromon laying for the best ant found yet. The number represents how many ants she equate to.
     num_iteration : number of time the colony will run the graph.
 
     returns : [best_makespan, best_schedule]
@@ -113,7 +113,6 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
         best_local_schedule = None
         best_local_makespan = np.inf
 
-        local_ant_dict = {}
         for ant in range(local_num_ant):
 
             # initiate variables
@@ -164,17 +163,15 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
                 best_global_makespan = local_current_makespan
                 best_global_schedule = machines
             # no more in the ant loop
-            # LOCAL RESULT FOR LOCAL SENDING
-            local_ant_dict[ant] = {"Makespan": local_current_makespan,
-                                   "Schedule": machines}
             # every local ants have done their tour
 
-        local_iterations_results[it] = local_ant_dict
+        local_iterations_results[it] = local_ant_solutions
 
         # adding a best ant method
         best_ant_index = np.argmin(
             list(map(lambda x: makespan(x[1]), local_ant_solutions)))
         local_best_ant_solution = local_ant_solutions[best_ant_index]
+        best_ant_makespan = makespan(local_best_ant_solution[1])
 
         # Updating the Pheromone Matrix after each ant
         # Evaporation affect all process the same...
@@ -182,13 +179,13 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
 
         # local addition of ants' choice
         local_pheromone_addition_matrix = np.zeros_like(pheromone_matrix)
-        for ant in local_ant_solutions:
-            for i in range(len(ant[0]) - 1):
-                local_pheromone_addition_matrix[jobs_to_index_mapping[ant[0][i]],
-                                                jobs_to_index_mapping[ant[0][i+1]]] += q/makespan(machines)
-            if ant == local_best_ant_solution:
-                local_pheromone_addition_matrix[jobs_to_index_mapping[ant[0][i]],
-                                                jobs_to_index_mapping[ant[0][i+1]]] += q_best/makespan(machines)
+        for ant_solution in local_ant_solutions:
+            for i in range(len(ant_solution[0]) - 1):
+                local_pheromone_addition_matrix[jobs_to_index_mapping[ant_solution[0][i]],
+                                                jobs_to_index_mapping[ant_solution[0][i+1]]] += q*np.exp(50*(best_ant_makespan-makespan(ant_solution[1]))/best_ant_makespan)
+            if ant_solution == local_best_ant_solution:
+                local_pheromone_addition_matrix[jobs_to_index_mapping[ant_solution[0][i]],
+                                                jobs_to_index_mapping[ant_solution[0][i+1]]] += q_best*np.exp(50*(best_ant_makespan-makespan(ant_solution[1]))/best_ant_makespan)
 
         # addition of all resulting matrix
         global_addition_matrix = np.zeros_like(local_pheromone_addition_matrix)
@@ -282,12 +279,14 @@ def ACO_elite_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
         best_ant_index = np.argmin(
             list(map(lambda x: makespan(x[1]), ant_solutions)))
         best_ant_solution = ant_solutions[best_ant_index]
+        best_ant_makespan = makespan(best_ant_solution)
 
         # Updating the Pheromone Matrix using the best ant in each colony
         pheromone_matrix *= (1-evaporation_rate)
+
         for i in range(len(ant_path) - 1):
             pheromone_matrix[jobs_to_index_mapping[ant_path[i]],
-                             jobs_to_index_mapping[ant_path[i+1]]] += q/makespan(machines)
+                             jobs_to_index_mapping[ant_path[i+1]]] += q*np.exp((best_ant_makespan-makespan(machines))/best_ant_makespan)
 
         current_makespan = makespan(best_ant_solution[1])
 

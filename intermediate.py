@@ -67,13 +67,13 @@ def resolution(parameters):
             print("gathering of final solutions")
             iterations_results: dict = {}
             for iter in range(parameters["iteration number"]):
-                ant_number = 0
-                local_ant_dict = {}
+                local_ant_list = []
                 for ant in range(parameters["ants number"]//comm_size):
                     for i in range(0, comm.Get_size()):
-                        local_ant_dict[ant_number] = iterations_results_list[i][iter][ant]
-                        ant_number += 1
-                iterations_results[iter] = local_ant_dict
+                        local_ant_list.append(
+                            iterations_results_list[i][iter][ant])
+
+                iterations_results[iter] = local_ant_list
             plot_save.plot_save(iterations_results, parameters)
             print(
                 "\n============================    FINAL RESULTS   =================================\n")

@@ -13,10 +13,10 @@ parameters = {
     "machines number":
     2,
     "ants number":
-    1000,
+    100,
 
     "iteration number":
-    100,
+    50,
 
     # HYPERPARAM
     "alpha":
@@ -26,9 +26,9 @@ parameters = {
     "evaporation":
     0.2,
     "Q":
-    1,
+    50,
     "Qbest":
-    1000,
+    100,
     "visibility function":
     # "process",
     "child and process",
