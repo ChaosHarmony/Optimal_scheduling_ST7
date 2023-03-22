@@ -2,7 +2,7 @@ from intermediate import resolution
 
 parameters = {
     "DAG_path":
-    "./Graphs/smallRandom.json",
+    "./Graphs/smallComplex.json",
     # "./Graphs/mediumRandom.json",
 
     "Ants type":
@@ -13,10 +13,10 @@ parameters = {
     "machines number":
     2,
     "ants number":
-    100,
+    1000,
 
     "iteration number":
-    10,
+    100,
 
     # HYPERPARAM
     "alpha":
@@ -28,8 +28,17 @@ parameters = {
     "Q":
     1,
     "visibility function":
-    "process"
-    # "child and process"
+    "process",
+    # "child and process",
+
+    # print option :
+    "log scale": True,
+    "time unit":
+    # 's',
+    # 'min',
+    'h',
+
+    "txt results": False
 
 }
 

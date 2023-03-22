@@ -112,7 +112,9 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
         best_local_schedule = None
         best_local_makespan = np.inf
 
+        local_ant_dict = {}
         for ant in range(local_num_ant):
+
             # initiate variables
             machines = [Machine(i+1) for i in range(num_machines)]
             visited_jobs = set()
@@ -146,7 +148,7 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
                 available_nodes.remove(next_node)
                 current_node = next_node
 
-            #everything is done
+            # everything is done
             completed_jobs.clear()
             # get solution localized
             local_ant_solutions.append((ant_path, machines))
@@ -162,10 +164,11 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
                 best_global_schedule = copy(machines)
             # no more in the ant loop
             # LOCAL RESULT FOR LOCAL SENDING
-            local_ant_dict = {ant: {"Makespan": local_current_makespan,
-                                    "Schedule": copy(machines)}}
-            local_iterations_results[it+1] = local_ant_dict
+            local_ant_dict[ant] = {"Makespan": local_current_makespan,
+                                   "Schedule": 1}  # copy(machines)}}
             # every local ants have done their tour
+
+        local_iterations_results[it+1] = local_ant_dict
 
         # Updating the Pheromone Matrix after each ant
         # Evaporation affect all process the same...
@@ -187,8 +190,6 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
         # print(f'Iteration {it}:', pheromone_matrix)
 
         # LOCAL RESULT FOR LOCAL SENDING
-        local_iterations_results[it+1] = {"Makespan": best_local_makespan,
-                                          "Schedule": best_local_schedule}
     return best_global_makespan, best_global_schedule, local_iterations_results
 
 
@@ -220,8 +221,8 @@ def ACO_elite_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
     best_global_schedule = None
     best_global_makespan = np.inf
 
-    #print("Eta", eta)
-    #print("Initial Pheormone Matrix",pheromone_matrix)
+    # print("Eta", eta)
+    # print("Initial Pheormone Matrix",pheromone_matrix)
 
     iterations_results = {}
 

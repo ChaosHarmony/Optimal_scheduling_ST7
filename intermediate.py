@@ -10,6 +10,7 @@ from visibility_func import *
 from graph_functions import *
 from time import process_time
 from mpi4py import MPI
+import plot_save
 
 
 def visibility_choice(parameters):
@@ -50,8 +51,8 @@ def resolution(parameters):
 
         print("best makepan of process #{0} : {1}h ".format(
             comm.Get_rank(), local_best_makespan))
-        print("best schedule of process #{0} : {1} ".format(
-            comm.Get_rank(), local_best_schedule))
+        # print("best schedule of process #{0} : {1} ".format(
+        #    comm.Get_rank(), local_best_schedule))
         print(
             f"Elapsed time (CPU) for process#{comm.Get_rank()}: {basic_ant_end-basic_ant_start}s")
 
@@ -63,14 +64,15 @@ def resolution(parameters):
                 "\n==============================================================================\n")
             print("gathering of final solutions")
             iterations_results: dict = iterations_results_list[0]
-            for i in range(1, comm.Get_size()):
-                for key in iterations_results.keys():
-                    if iterations_results_list[i][key]["Makespan"] < iterations_results[key]["Makespan"]:
-                        iterations_results[key] = iterations_results_list[i][key]
-
-            plt.plot(iterations_results.keys(), list(
-                map(lambda x: x["Makespan"], iterations_results.values())))
-            plt.savefig("./results.png")
+            for key in iterations_results.keys():
+                ant_number = 0
+                local_ant_dict = {}
+                for ant in range(parameters["ants number"]//comm_size):
+                    for i in range(1, comm.Get_size()):
+                        local_ant_dict[ant_number] = iterations_results_list[i][key][ant]
+                        ant_number += 1
+                iterations_results[key] = local_ant_dict
+            plot_save.plot_save(iterations_results, parameters)
             print(
                 "\n==============================================================================\n")
         print("\n====================================      END      ===============================\n")
