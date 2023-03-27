@@ -7,7 +7,7 @@ def convert_to_seconds(ch):
     hh, mm, ss = ch.split(':')
     return 3600*int(hh) + 60*int(mm) + float(ss)
 
-def import_graph(filepath: str) -> list[Job]:
+def import_graph(filepath: str): # List[Job]
     with open(filepath) as data:
         contents = data.read()
     contents = json.loads(contents)
@@ -20,7 +20,7 @@ def import_graph(filepath: str) -> list[Job]:
         temp_job_dict[node].dependencies = [temp_job_dict[node] for node in value["Dependencies"]]
     return list(temp_job_dict.values())
 
-def create_DAG(joblist : list[Job]):
+def create_DAG(joblist): # List[Job]
     G = nx.DiGraph()
     G.add_nodes_from(joblist)
     for job in joblist:
