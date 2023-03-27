@@ -25,5 +25,5 @@ def create_DAG(joblist : list[Job]):
     G.add_nodes_from(joblist)
     for job in joblist:
         for precendent_job in job.dependencies:
-            G.add_edge(precendent_job, job)
+            G.add_edge(precendent_job, job, weight = precendent_job.get_processing_time())
     return G
