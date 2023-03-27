@@ -4,7 +4,7 @@ parameters = {
     "DAG_path":
     #"./Graphs/smallRandom.json",
     #"./Graphs/xlargeComplex.json",
-    "./Graphs/mediumComplex.json",
+    "./Graphs/MediumComplex.json",
 
     "Ants type":
     "Basic Ants",
