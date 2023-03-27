@@ -26,16 +26,16 @@ def test_func_MPI():
 # Objective Functions
 
 
-def makespan(machines: list[Machine]) -> float:
+def makespan(machines) -> float: #list[Machine]
     return max(map(lambda x: x.completion_time(), machines))
 
 
 # Helper Functions
-def get_initial_jobs(graph: nx.DiGraph) -> list[Job]:
+def get_initial_jobs(graph: nx.DiGraph):  #list[Job]
     return list(map(lambda x: x[0], filter(lambda x: x[1] == 0, graph.in_degree())))
 
 
-def get_next_available_jobs(graph: nx.DiGraph, visited_jobs: set[Job], completed_job: Job) -> list[Job]:
+def get_next_available_jobs(graph: nx.DiGraph, visited_jobs, completed_job: Job) :
     available_jobs = []
     # iterates over the successor of the completed_job
     for successor in graph.successors(completed_job):
@@ -47,7 +47,7 @@ def get_next_available_jobs(graph: nx.DiGraph, visited_jobs: set[Job], completed
     return available_jobs
 
 
-def probabilites_construction(alpha: float, beta: float, eta: np.array, pheromone_matrix: np.array, jobs_to_index_mapping, current_node: Job = None, available_nodes: list[Job] = None):
+def probabilites_construction(alpha: float, beta: float, eta: np.array, pheromone_matrix: np.array, jobs_to_index_mapping, current_node: Job = None, available_nodes = None):
     available_idx = list(
         map(lambda x: jobs_to_index_mapping[x], available_nodes))
     available_probabilites = np.ones(len(available_idx))
@@ -104,7 +104,7 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
 
     for it in range(num_iterations):
         # Create a list of tuples for ant solutions
-        local_ant_solutions: list[(list[Job], list[Machine])] = []
+        local_ant_solutions = []
 
         # Completed Job dict to fix scheudling bug
         # [Job] : {Node: ("Machine", "start_time", "end_time"))
@@ -234,7 +234,7 @@ def ACO_elite_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
 
     for it in range(num_iterations):
         # Create a list of tuples for ant solutions
-        ant_solutions: list[(list[Job], list[Machine])] = []
+        ant_solutions = [] #list[(list[Job], list[Machine])]
 
         # Completed Job dict to fix scheudling bug
         # [Job] : {Node: ("Machine", "start_time", "end_time"))
