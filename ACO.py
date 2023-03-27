@@ -65,7 +65,7 @@ def probabilites_construction(alpha: float, beta: float, eta: np.array, pheromon
     return available_probabilites
 
 
-def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10, alpha: float = 1.0, beta: float = 2.0, evaporation_rate: float = 0.2, q: float = 1.0, q_best: float = 25.0, visibility_function=procces_visibilty_func, num_iterations: int = 100):
+def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10, alpha: float = 1.0, beta: float = 2.0, evaporation_rate: float = 0.2, q: float = 1.0, n_best: float = 0.10, visibility_function=procces_visibilty_func, num_iterations: int = 100):
     '''
     graph : directed graph
     num_machines : number of machines given by the problem
@@ -113,6 +113,8 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
         best_local_schedule = None
         best_local_makespan = np.inf
 
+        basic_ants = True
+
         for ant in range(local_num_ant):
 
             # initiate variables
@@ -156,9 +158,6 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
             local_current_makespan = makespan(machines)
 
             # Update best local ant
-            if local_current_makespan < best_local_makespan:
-                best_local_makespan = local_current_makespan
-                best_local_schedule = machines
             if local_current_makespan < best_global_makespan:
                 best_global_makespan = local_current_makespan
                 best_global_schedule = machines
@@ -170,28 +169,46 @@ def ACO_basic_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
         # adding a best ant method
         best_ant_index = np.argmin(
             list(map(lambda x: makespan(x[1]), local_ant_solutions)))
-        local_best_ant_solution = local_ant_solutions[best_ant_index]
-        best_ant_makespan = makespan(local_best_ant_solution[1])
+        best_ant_makespan = makespan(local_ant_solutions[best_ant_index][1])
 
-        # Updating the Pheromone Matrix after each ant
-        # Evaporation affect all process the same...
+        if basic_ants and (it < it//2) and n_best != 0:
+            basic_ants = False
+
+            # Updating the Pheromone Matrix after each ant
+            # Evaporation affect all process the same...
         pheromone_matrix *= (1-evaporation_rate)
 
         # local addition of ants' choice
         local_pheromone_addition_matrix = np.zeros_like(pheromone_matrix)
-        for ant_solution in local_ant_solutions:
-            for i in range(len(ant_solution[0]) - 1):
-                local_pheromone_addition_matrix[jobs_to_index_mapping[ant_solution[0][i]],
-                                                jobs_to_index_mapping[ant_solution[0][i+1]]] += q*np.exp(50*(best_ant_makespan-makespan(ant_solution[1]))/best_ant_makespan)
-            if ant_solution == local_best_ant_solution:
-                local_pheromone_addition_matrix[jobs_to_index_mapping[ant_solution[0][i]],
-                                                jobs_to_index_mapping[ant_solution[0][i+1]]] += q_best*np.exp(50*(best_ant_makespan-makespan(ant_solution[1]))/best_ant_makespan)
+        if basic_ants:
 
+            for ant_solution in local_ant_solutions:
+                for i in range(len(ant_solution[0]) - 1):
+                    local_pheromone_addition_matrix[jobs_to_index_mapping[ant_solution[0][i]],
+                                                    jobs_to_index_mapping[ant_solution[0][i+1]]] += q*np.exp(100*(best_ant_makespan-makespan(ant_solution[1]))/best_ant_makespan)
+            global_addition_matrix = np.zeros_like(
+                local_pheromone_addition_matrix)
+            comm.Allreduce(
+                local_pheromone_addition_matrix, global_addition_matrix, op=MPI.SUM)
+            pheromone_matrix += global_addition_matrix
+        else:  # swiching to elite ant strategy
+            best_ant_indexes = np.argsort(
+                list(map(lambda x: makespan(x[1]), local_ant_solutions)))
+
+            best_ants = []
+            for index in best_ant_indexes:
+                best_ants.append(local_ant_solutions[index])
+
+            for ant_solution in best_ants:
+                for i in range(len(ant_solution[0]) - 1):
+                    local_pheromone_addition_matrix[jobs_to_index_mapping[ant_solution[0][i]],
+                                                    jobs_to_index_mapping[ant_solution[0][i+1]]] += q*np.exp(100*(best_ant_makespan-makespan(ant_solution[1]))/best_ant_makespan)
+            global_addition_matrix = np.zeros_like(
+                local_pheromone_addition_matrix)
+            comm.Allreduce(
+                local_pheromone_addition_matrix, global_addition_matrix, op=MPI.SUM)
+            pheromone_matrix += global_addition_matrix
         # addition of all resulting matrix
-        global_addition_matrix = np.zeros_like(local_pheromone_addition_matrix)
-        comm.Allreduce(
-            local_pheromone_addition_matrix, global_addition_matrix, op=MPI.SUM)
-        pheromone_matrix += global_addition_matrix
 
         # print(f'Iteration {it}:', pheromone_matrix)
 

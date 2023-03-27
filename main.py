@@ -26,9 +26,9 @@ parameters = {
     "evaporation":
     0.2,
     "Q":
-    50,
-    "Qbest":
-    100,
+    1000,
+    "nbest":
+    0.10,
     "visibility function":
     # "process",
     "child and process",

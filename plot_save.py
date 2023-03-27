@@ -3,6 +3,11 @@ import numpy as np
 from ACO import makespan
 
 
+def select_graph(parameters):
+
+    return parameters['DAG_path'][parameters['DAG_path'].index('/')+1::]
+
+
 def plot_save(result_dict: dict, parameters: dict):
     iteration = result_dict.keys()
     max_results = np.empty((parameters['iteration number'],))
@@ -45,7 +50,7 @@ def plot_save(result_dict: dict, parameters: dict):
     #         color="blue", label="mean - std")
     plt.xlabel("Iterations of ant colony")
     plt.ylabel("Makespan (h)")
-    plt.title("Optimization of ... with {0} ants and {1} iterations. \n Q = {2}, rho = {3}, alpha = {4}, beta = {5}".format(
-        num_ant, parameters['iteration number'], parameters["Q"], parameters["evaporation"], parameters["alpha"], parameters["beta"]))
+    plt.title("Optimization of {0} with {1} ants and {2} iterations. \n Q = {3}, rho = {4}, alpha = {5}, beta = {6}".format(select_graph(parameters),
+                                                                                                                            num_ant, parameters['iteration number'], parameters["Q"], parameters["evaporation"], parameters["alpha"], parameters["beta"]))
     plt.legend()
     plt.savefig("./results.png")
