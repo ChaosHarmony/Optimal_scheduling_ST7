@@ -1,8 +1,9 @@
 from Job import Job
+from typing import *
 
 class Machine:
     id = 0
-    schedule : list[(Job, float, float)] = None
+    schedule = None # list[(Job, float, float)]
     jobs_performed : int = 0
     current_job_end_time = 0.0
     

@@ -44,10 +44,10 @@ def plot_save(result_dict: dict, parameters: dict):
     plt.plot(iteration, min_results, color="red",
              marker='.', ls='', label='min')
     plt.plot(iteration, mean_results, "--g", label="mean")
-    # plt.plot(iteration, mean_results+standard_deviation,
-    #         color="purple", label="mean + std")
-    # plt.plot(iteration, mean_results-standard_deviation,
-    #         color="blue", label="mean - std")
+    plt.plot(iteration, mean_results+standard_deviation,
+            color="purple", label="mean + std")
+    plt.plot(iteration, mean_results-standard_deviation,
+            color="blue", label="mean - std")
     plt.xlabel("Iterations of ant colony")
     plt.ylabel("Makespan (h)")
     plt.title("Optimization of {0} with {1} ants and {2} iterations. \n Q = {3}, rho = {4}, alpha = {5}, beta = {6}".format(select_graph(parameters),
