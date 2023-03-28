@@ -2,7 +2,7 @@ from intermediate import resolution
 
 parameters = {
     "DAG_path":
-    "./Graphs/smallRandom.json",
+    "./Graphs/mediumRandom.json",
     # "./Graphs/xlargeComplex.json",
     # "./Graphs/mediumComplex.json",
 
@@ -13,12 +13,12 @@ parameters = {
 
 
     "machines number":
-    2,
+    4,
     "ants number":
-    10,
+    100,
 
     "iteration number":
-    2,
+    50,
 
     # HYPERPARAM
     "alpha":
@@ -28,7 +28,7 @@ parameters = {
     "evaporation":
     0.2,
     "Q":
-    0.3,
+    1,
     "nbest":
     0.10,
     "switching rate":  # sr*nu_it = it with basic ants
@@ -49,7 +49,7 @@ parameters = {
 
     "txt results": False,
 
-    "repo": "./result/"
+    "repo": "./results/"
 }
 
 

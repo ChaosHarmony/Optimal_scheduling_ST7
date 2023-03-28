@@ -172,8 +172,10 @@ def ACO_hybrid_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10
                 best_global_schedule = machines
             # no more in the ant loop
             # every local ants have done their tour
-
-        local_iterations_results[it] = local_ant_solutions
+            local_iterations_results[it] = []
+        for ant in range(local_num_ant):
+            local_iterations_results[it].append(makespan(
+                local_ant_solutions[ant][1]))
 
         # adding a best ant method
         best_ant_index = np.argmin(

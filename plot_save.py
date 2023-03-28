@@ -10,7 +10,7 @@ def select_graph(parameters):
 
 def plot_save(result_dict: dict, parameters: dict):
     iteration = result_dict.keys()
-    graph_name = select_graph(parameters["DAG_path"])
+    graph_name = select_graph(parameters)
     max_results = np.empty((parameters['iteration number'],))
     min_results = np.empty((parameters['iteration number'],))
     mean_results = np.empty((parameters['iteration number'],))
@@ -19,9 +19,9 @@ def plot_save(result_dict: dict, parameters: dict):
     for iter in iteration:
         # extraction
 
-        iteration_makespan = np.empty((num_ant,))
-        for ant in range(num_ant):
-            iteration_makespan[ant] = makespan(result_dict[iter][ant][1])
+        iteration_makespan = np.array(result_dict[iter])
+        # for ant in range(num_ant):
+        #    iteration_makespan[ant] = makespan(result_dict[iter][ant][1])
 
         # time unit
         tu = parameters["time unit"]
@@ -55,7 +55,7 @@ def plot_save(result_dict: dict, parameters: dict):
                                                                                                                             num_ant, parameters['iteration number'], parameters["Q"], parameters["evaporation"], parameters["alpha"], parameters["beta"]))
     plt.legend()
     plt.savefig("{0}{1}_{2}_{3}iter_{4}.png".format(
-        parameters["repo"], graph_name, parameters["Ants type"], parameters["iteration number"], np.random.randint(0, 2**32)))
+        parameters["repo"], graph_name, parameters["Ants type"], parameters["iteration number"], np.random.randint(0, 2**8)))
 
 
 if __name__ == "__main__":

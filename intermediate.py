@@ -78,6 +78,8 @@ def resolution(parameters):
             print(
                 "\n============================    FINAL RESULTS   =================================\n")
 
+            print(parameters)
+
             print("best makespan : ", min(
                 makespan_list)/parameters["time unit"])
             print(
