@@ -4,12 +4,13 @@ from ACO import makespan
 
 
 def select_graph(parameters):
-
-    return parameters['DAG_path'][parameters['DAG_path'].index('/')+1::]
+    biggis = parameters['DAG_path'][parameters['DAG_path'].index('/')+1::]
+    return biggis[biggis.index('/')+1::]
 
 
 def plot_save(result_dict: dict, parameters: dict):
     iteration = result_dict.keys()
+    graph_name = select_graph(parameters["DAG_path"])
     max_results = np.empty((parameters['iteration number'],))
     min_results = np.empty((parameters['iteration number'],))
     mean_results = np.empty((parameters['iteration number'],))
@@ -45,12 +46,19 @@ def plot_save(result_dict: dict, parameters: dict):
              marker='.', ls='', label='min')
     plt.plot(iteration, mean_results, "--g", label="mean")
     plt.plot(iteration, mean_results+standard_deviation,
-            color="purple", label="mean + std")
+             color="purple", label="mean + std")
     plt.plot(iteration, mean_results-standard_deviation,
-            color="blue", label="mean - std")
+             color="blue", label="mean - std")
     plt.xlabel("Iterations of ant colony")
     plt.ylabel("Makespan (h)")
-    plt.title("Optimization of {0} with {1} ants and {2} iterations. \n Q = {3}, rho = {4}, alpha = {5}, beta = {6}".format(select_graph(parameters),
+    plt.title("Optimization of {0} with {1} ants and {2} iterations. \n Q = {3}, rho = {4}, alpha = {5}, beta = {6}".format(graph_name,
                                                                                                                             num_ant, parameters['iteration number'], parameters["Q"], parameters["evaporation"], parameters["alpha"], parameters["beta"]))
     plt.legend()
-    plt.savefig("./results.png")
+    plt.savefig("{0}{1}_{2}_{3}iter_{4}.png".format(
+        parameters["repo"], graph_name, parameters["Ants type"], parameters["iteration number"], np.random.randint(0, 2**32)))
+
+
+if __name__ == "__main__":
+
+    parameters = {"DAG_path": "./Graphs/smallmedium"}
+    print(select_graph(parameters))

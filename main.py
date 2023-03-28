@@ -47,8 +47,9 @@ parameters = {
     # 60, #min
     3600,  # h
 
-    "txt results": False
+    "txt results": False,
 
+    "repo": "./result/"
 }
 
 
