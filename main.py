@@ -2,7 +2,7 @@ from intermediate import resolution
 
 parameters = {
     "DAG_path":
-    "./Graphs/mediumRandom.json",
+    "./Graphs/smallRandom.json",
     # "./Graphs/xlargeComplex.json",
     # "./Graphs/mediumComplex.json",
 
@@ -13,12 +13,13 @@ parameters = {
 
 
     "machines number":
-    'get',  # get to use
+    "get",  # get to use
+
     "ants number":
-    100,
+    10,
 
     "iteration number":
-    50,
+    10,
 
     # HYPERPARAM
     "alpha":
@@ -64,10 +65,15 @@ alpha_beta = [(1, 1), (0.5, 1), (0.1, 1), (0.1, 0.5),
 for alpha, beta in alpha_beta:
     parameters["alpha"] = alpha
     parameters["beta"] = beta
-    resolution(parameters)
+    for Q in [1, 50]:
+        parameters["Q"] = Q
+        resolution(parameters)
 print("========================= END of alpha beta ====================")
 print("\n testing differente evaporations")
 evap = [0.1, 0.2, 0.25, 0.3, 0.5, 0.7]
+parameters["alpha"] = 1
+parameters["beta"] = 2
+parameters["Q"] = 50
 for rho in evap:
     parameters["evaporation"] = rho
     resolution(parameters)

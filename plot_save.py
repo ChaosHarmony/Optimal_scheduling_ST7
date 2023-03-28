@@ -39,7 +39,7 @@ def plot_save(result_dict: dict, parameters: dict):
 
         # end of tables
 
-    plt.figure(1)
+    plt.figure()
     plt.plot(iteration, max_results, color="red",
              marker='.', ls='', label='max')
     plt.plot(iteration, min_results, color="red",
@@ -56,6 +56,7 @@ def plot_save(result_dict: dict, parameters: dict):
     plt.legend()
     plt.savefig("{0}{1}_{2}_{3}iter_{4}.png".format(
         parameters["repo"], graph_name, parameters["Ants type"], parameters["iteration number"], np.random.randint(0, 2**8)))
+    plt.close()
 
 
 if __name__ == "__main__":
