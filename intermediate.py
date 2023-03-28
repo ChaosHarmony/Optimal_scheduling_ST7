@@ -36,12 +36,12 @@ def resolution(parameters):
 
     visibility_choice(parameters)
 
-    if parameters["Ants type"] == "Basic Ants":
-        print("Basic Ants")
+    if parameters["Ants type"] == "Hybrid Ants":
+        print("Hybrid Ants")
 
         basic_ant_start = process_time()
 
-        local_best_makespan, local_best_schedule, local_iterations_results = ACO_basic_ants(
+        local_best_makespan, local_best_schedule, local_iterations_results = ACO_hybrid_ants(
             graph=DAG, num_machines=parameters["machines number"], num_ants=parameters[
                 "ants number"], alpha=parameters["alpha"],
             beta=parameters["beta"], evaporation_rate=parameters["evaporation"], q=parameters["Q"],
