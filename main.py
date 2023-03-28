@@ -2,7 +2,7 @@ from intermediate import resolution
 
 parameters = {
     "DAG_path":
-    "./Graphs/smallRandom.json",
+    "./Graphs/mediumRandom.json",
     # "./Graphs/xlargeComplex.json",
     # "./Graphs/mediumComplex.json",
 
@@ -16,10 +16,10 @@ parameters = {
     "get",  # get to use
 
     "ants number":
-    10,
+    1000,
 
     "iteration number":
-    10,
+    100,
 
     # HYPERPARAM
     "alpha":
