@@ -46,7 +46,7 @@ def resolution(parameters):
                 "ants number"], alpha=parameters["alpha"],
             beta=parameters["beta"], evaporation_rate=parameters["evaporation"], q=parameters["Q"],
             n_best=parameters["nbest"], visibility_function=visibility_func,
-            num_iterations=parameters["iteration number"])
+            num_iterations=parameters["iteration number"], normalizing=parameters["normalize visibility"])
 # magic here ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         basic_ant_end = process_time()
 

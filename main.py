@@ -2,9 +2,9 @@ from intermediate import resolution
 
 parameters = {
     "DAG_path":
-    "./Graphs/smallRandom.json",
-    #"./Graphs/xlargeComplex.json",
-    #"./Graphs/mediumComplex.json",
+    "./Graphs/mediumRandom.json",
+    # "./Graphs/xlargeComplex.json",
+    # "./Graphs/mediumComplex.json",
 
     "Ants type":
     "Basic Ants",
@@ -27,12 +27,15 @@ parameters = {
     "evaporation":
     0.2,
     "Q":
-    1000,
+    0.3,
     "nbest":
     0.10,
     "visibility function":
     # "process",
     "child and process",
+
+    "normalize visibility":
+    False,
 
     # print option :
     "log scale": False,
