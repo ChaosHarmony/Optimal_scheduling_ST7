@@ -13,7 +13,7 @@ parameters = {
 
 
     "machines number":
-    4,
+    'get',  # get to use
     "ants number":
     100,
 
@@ -26,7 +26,7 @@ parameters = {
     "beta":
     2.0,
     "evaporation":
-    0.2,
+    0.25,
     "Q":
     1,
     "nbest":
@@ -38,7 +38,7 @@ parameters = {
     "child and process",
 
     "normalize visibility":
-    False,
+    True,
 
     # print option :
     "log scale": False,
@@ -52,5 +52,23 @@ parameters = {
     "repo": "./results/"
 }
 
-
-resolution(parameters)
+print("Testing for several Q values")
+Q_test = [0.01, 0.1, 0.3, 0.5, 1, 10, 50, 100, 1000]
+for Q in Q_test:
+    parameters["Q"] = Q
+    resolution(parameters)
+print("====================== END of Q =============================")
+print("\n Testing with 2Q, differente alpha and beta bias values")
+alpha_beta = [(1, 1), (0.5, 1), (0.1, 1), (0.1, 0.5),
+              (0.5, 0.1), (1, 0.1), (1, 2), (2, 1), (2, 2)]
+for alpha, beta in alpha_beta:
+    parameters["alpha"] = alpha
+    parameters["beta"] = beta
+    resolution(parameters)
+print("========================= END of alpha beta ====================")
+print("\n testing differente evaporations")
+evap = [0.1, 0.2, 0.25, 0.3, 0.5, 0.7]
+for rho in evap:
+    parameters["evaporation"] = rho
+    resolution(parameters)
+print("=========================== END ==========================")

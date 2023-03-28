@@ -25,7 +25,7 @@ def visibility_choice(parameters):
 
 
 def resolution(parameters):
-    print("\n==============================================================================\n")
+    print("\n==============================================================================")
     comm = MPI.COMM_WORLD
     print("hello main.py from : ", comm.Get_rank(), ' \n')
 
@@ -40,7 +40,8 @@ def resolution(parameters):
         print("Hybrid Ants")
 
         basic_ant_start = process_time()
-
+        if parameters["machines number"] == "get":
+            parameters["mahines number"] = Get_machines_number(DAG)
         local_best_makespan, local_best_schedule, local_iterations_results = ACO_hybrid_ants(
             graph=DAG, num_machines=parameters["machines number"], num_ants=parameters[
                 "ants number"], alpha=parameters["alpha"],
@@ -60,11 +61,11 @@ def resolution(parameters):
         # print(list(map(lambda x: x["Makespan"], iterations_results.values())))
         iterations_results_list = comm.gather(local_iterations_results, root=0)
         makespan_list = comm.gather(local_best_makespan, root=0)
-        print("\n==============================================================================\n")
+        print("==============================================================================\n")
         if rank == 0:
             print(
-                "\n==============================================================================\n")
-            print("gathering of final solutions")
+                "\n===========================gathering final solutions==============================\n")
+
             iterations_results: dict = {}
             for iter in range(parameters["iteration number"]):
                 local_ant_list = []
@@ -82,8 +83,7 @@ def resolution(parameters):
 
             print("best makespan : ", min(
                 makespan_list)/parameters["time unit"])
-            print(
-                "\n====================================      END      ===============================\n")
+
     if parameters["Ants type"] == "Elite Ants":
         print("Elite Ants")
         elite_ant_start = process_time()
