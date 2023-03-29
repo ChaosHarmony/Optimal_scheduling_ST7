@@ -16,7 +16,7 @@ parameters = {
     "get",  # get to use
 
     "ants number":
-    1000,
+    100,
 
     "iteration number":
     100,
