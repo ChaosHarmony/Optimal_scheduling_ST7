@@ -54,8 +54,8 @@ def plot_save(result_dict: dict, parameters: dict):
     plt.title("Optimization of {0} with {1} ants and {2} iterations. \n Q = {3}, rho = {4}, alpha = {5}, beta = {6}".format(graph_name,
                                                                                                                             num_ant, parameters['iteration number'], parameters["Q"], parameters["evaporation"], parameters["alpha"], parameters["beta"]))
     plt.legend()
-    plt.savefig("{0}{1}_{2}_{3}iter_{4}.png".format(
-        parameters["repo"], graph_name, parameters["Ants type"], parameters["iteration number"], np.random.randint(0, 2**8)))
+    plt.savefig("{0}{1}_{2}_{3}iter_{4}_{5}.png".format(
+        parameters["repo"], graph_name, parameters["Ants type"], parameters["iteration number"], parameters["reward"], np.random.randint(0, 2**8)))
     plt.close()
 
 

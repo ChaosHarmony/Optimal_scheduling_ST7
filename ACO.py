@@ -65,7 +65,11 @@ def probabilites_construction(alpha: float, beta: float, eta: np.array, pheromon
     return available_probabilites
 
 
-def ACO_hybrid_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10, alpha: float = 1.0, beta: float = 2.0, evaporation_rate: float = 0.2, q: float = 1.0, n_best: float = 0.10, switching_rate=0.5, visibility_function=procces_visibilty_func, num_iterations: int = 100, normalizing=True):
+def normalize(matrix):
+    return matrix/np.max(matrix)
+
+
+def ACO_hybrid_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10, alpha: float = 1.0, beta: float = 2.0, evaporation_rate: float = 0.2, q: float = 1.0, reward='exp', C=100, n_best: float = 0.10, switching_rate=0.5, visibility_function=procces_visibilty_func, num_iterations: int = 100, normalizing=True):
     '''
     graph : directed graph
     num_machines : number of machines given by the problem
@@ -90,18 +94,11 @@ def ACO_hybrid_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10
     # Initialise the Phermonone Matrix and Visbility Matrix
     pheromone_matrix = np.ones((len(graph), len(graph)))
     eta = np.zeros((len(graph), len(graph)))
+    for i in range(len(graph)):
+        for j in range(len(graph)):
+            eta[i, j] = visibility_function(index_to_jobs_mapping[j])
     if normalizing:
-        for i in range(len(graph)):
-            for j in range(len(graph)):
-                eta[i, j] = visibility_function(index_to_jobs_mapping[j])
-        max_eta = np.max(eta)
-        eta = eta/max_eta
-
-    else:
-
-        for i in range(len(graph)):
-            for j in range(len(graph)):
-                eta[i, j] = visibility_function(index_to_jobs_mapping[j])
+        eta = normalize(eta)
 
     best_global_schedule = None
     best_global_makespan = np.inf
@@ -194,16 +191,24 @@ def ACO_hybrid_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10
 
             for ant_solution in local_ant_solutions:
                 for i in range(len(ant_solution[0]) - 1):
-                    local_pheromone_addition_matrix[jobs_to_index_mapping[ant_solution[0][i]],
-                                                    jobs_to_index_mapping[ant_solution[0][i+1]]] += q*np.exp(100*(best_ant_makespan-makespan(ant_solution[1]))/best_ant_makespan)
+                    if reward == 'exp':
+                        local_pheromone_addition_matrix[jobs_to_index_mapping[ant_solution[0][i]],
+                                                        jobs_to_index_mapping[ant_solution[0][i+1]]] += q*np.exp(C*(best_ant_makespan-makespan(ant_solution[1]))/best_ant_makespan)
+                    elif reward == 'frac':
+                        local_pheromone_addition_matrix[jobs_to_index_mapping[ant_solution[0][i]],
+                                                        jobs_to_index_mapping[ant_solution[0][i+1]]] += q*(1-(best_ant_makespan-makespan(ant_solution[1]))/best_ant_makespan)
+
             global_addition_matrix = np.zeros_like(
                 local_pheromone_addition_matrix)
             comm.Allreduce(
                 local_pheromone_addition_matrix, global_addition_matrix, op=MPI.SUM)
             pheromone_matrix += global_addition_matrix
+            if normalizing:
+                pheromone_matrix = normalize(pheromone_matrix)
 
         ########################################################
         else:  # swiching to elite ant strategy
+
             elite_pheromon = np.zeros_like(local_pheromone_addition_matrix)
             every_ants_solution_gather = comm.gather(
                 local_ant_solutions, root=0)
@@ -220,16 +225,19 @@ def ACO_hybrid_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10
                 for index in range(floor(num_ants*n_best)):
                     best_ants.append(
                         local_ant_solutions[best_ant_indexes[index]])
+
             ###### Selected best ants ####################
 
                 for ant_solution in best_ants:
                     for i in range(len(ant_solution[0]) - 1):
                         local_pheromone_addition_matrix[jobs_to_index_mapping[ant_solution[0][i]],
-                                                        jobs_to_index_mapping[ant_solution[0][i+1]]] += q*np.exp(100*(best_ant_makespan-makespan(ant_solution[1]))/best_ant_makespan)
+                                                        jobs_to_index_mapping[ant_solution[0][i+1]]] += q*num_ants*np.exp(C*(best_ant_makespan-makespan(ant_solution[1]))/best_ant_makespan)
                 # exit 0 process
             # colecting
             comm.Bcast(elite_pheromon, root=0)
             pheromone_matrix += elite_pheromon
+            if normalizing:
+                normalize(pheromone_matrix)
         # addition of all resulting matrix
 
         # print(f'Iteration {it}:', pheromone_matrix)

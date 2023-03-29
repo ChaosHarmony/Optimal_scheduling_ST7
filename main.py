@@ -19,24 +19,31 @@ parameters = {
     100,
 
     "iteration number":
-    100,
+    50,
 
     # HYPERPARAM
     "alpha":
-    1.0,
-    "beta":
     2.0,
+    "beta":
+    1.0,
     "evaporation":
-    0.25,
+    0.3,
     "Q":
     1,
+    "reward":
+    "exp",
+    # "frac",
+    "C":
+    50,
+    # 1,
+    # 10,
     "nbest":
     0.10,
     "switching rate":  # sr*nu_it = it with basic ants
-    0.5,
+    0.3,
     "visibility function":
-    # "process",
-    "child and process",
+    "process",
+    # "child and process",
 
     "normalize visibility":
     True,
@@ -53,19 +60,25 @@ parameters = {
     "repo": "./results/"
 }
 
+
+resolution(parameters)
+
+"""
 print("Testing for several Q values")
-Q_test = [0.01, 0.1, 0.3, 0.5, 1, 10, 50, 100, 1000]
+Q_test = [0.001, 0.01, 0.1, 1, 10, 100]
+parameters["repo"] = "./results/Q_param"
 for Q in Q_test:
     parameters["Q"] = Q
     resolution(parameters)
 print("====================== END of Q =============================")
-print("\n Testing with 2Q, differente alpha and beta bias values")
+print("\n Testing with 3Q, different alpha and beta bias values")
+parameters["repo"] = al
 alpha_beta = [(1, 1), (0.5, 1), (0.1, 1), (0.1, 0.5),
-              (0.5, 0.1), (1, 0.1), (1, 2), (2, 1), (2, 2)]
+              (0.5, 0.1), (1, 0.1), (1, 2), (2, 1)]
 for alpha, beta in alpha_beta:
     parameters["alpha"] = alpha
     parameters["beta"] = beta
-    for Q in [1, 50]:
+    for Q in [0.01, 0.1, 1]:
         parameters["Q"] = Q
         resolution(parameters)
 print("========================= END of alpha beta ====================")
@@ -77,4 +90,6 @@ parameters["Q"] = 50
 for rho in evap:
     parameters["evaporation"] = rho
     resolution(parameters)
+print("S")
 print("=========================== END ==========================")
+"""
