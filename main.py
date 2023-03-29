@@ -46,7 +46,7 @@ parameters = {
     # "child and process",
 
     "normalize visibility":
-    True,
+    False,
 
     # print option :
     "log scale": False,
