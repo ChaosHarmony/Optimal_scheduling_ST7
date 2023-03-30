@@ -2,8 +2,8 @@ from intermediate import resolution
 
 parameters = {
     "DAG_path":
-    "./Graphs/mediumRandom.json",
-    # "./Graphs/xlargeComplex.json",
+    #"./Graphs/mediumRandom.json",
+     "./Graphs/largeComplex.json",
     # "./Graphs/mediumComplex.json",
 
     "Ants type":
