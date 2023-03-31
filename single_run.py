@@ -2,10 +2,11 @@ from intermediate import resolution
 
 parameters = {
     "DAG_path":
-    "./Graphs/mediumRandom.json",
-    # "./Graphs/xlargeComplex.json",
-    # "./Graphs/mediumComplex.json",
-
+    #"./Graphs/smallRandom.json",
+     "./Graphs/largeComplex.json",
+    #"./Graphs/xsmallComplex.json",
+    #"./Graphs/mediumRandom.json",
+    
     "Ants type":
     "Hybrid Ants",
     # "Basic Ants",
@@ -16,18 +17,18 @@ parameters = {
     "get",  # get to use
 
     "ants number":
-    10,
+    20,
 
     "iteration number":
-    100,
+    50,
 
     # HYPERPARAM
     "alpha":
-    1.0,
+    2.0,
     "beta":
     1.0,
     "evaporation":
-    0.975,
+    0.3,
     "Q":
     1,
     "reward":
@@ -38,15 +39,15 @@ parameters = {
     # 1,
     # 10,
     "nbest":
-    0,
+    0.10,
     "switching rate":  # sr*nu_it = it with basic ants
-    0,
+    0.5,
     "visibility function":
-    "process",
-    # "child and process",
+    #"process",
+    "child and process",
 
     "normalize visibility":
-    True,
+    False,
 
     # print option :
     "log scale": False,

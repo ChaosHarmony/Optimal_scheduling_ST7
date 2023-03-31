@@ -42,6 +42,8 @@ def resolution(parameters):
         basic_ant_start = process_time()
         if parameters["machines number"] == "get":
             parameters["machines number"] = Get_machines_number(DAG)
+        
+        print ("Scheduling {} jobs on {} machines".format(len(DAG.nodes), parameters["machines number"]))
         local_best_makespan, local_best_schedule, local_iterations_results = ACO_hybrid_ants(
             graph=DAG, num_machines=parameters["machines number"], num_ants=parameters[
                 "ants number"], alpha=parameters["alpha"],
