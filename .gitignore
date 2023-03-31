@@ -2,3 +2,9 @@ __pycache__
 Graphs/largeComplex.json
 Graphs/xlargeComplex.json
 Graphs/xxlargeComplex.json
+results/Q_param/*
+results/C_param/*
+results/reward/*
+results/evap/*
+results/n_ant_param/*
+results/Bias_param/*

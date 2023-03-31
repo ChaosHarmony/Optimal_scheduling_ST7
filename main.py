@@ -92,7 +92,11 @@ for rho in evap:
     parameters["evaporation"] = rho
     resolution(parameters)
 print("======================= END of evap ==========================")
+<<<<<<< HEAD
 parameters["repo"] = "results/C_param/"
+=======
+parameters["repo"] = "resluts/C_param/"
+>>>>>>> 4b290424cf97abceff2a9b397fa44d47479990e4
 C = [1, 10, 50, 100]
 parameters["Q"] = 0.1
 parameters["evaporation"] = 0.3
