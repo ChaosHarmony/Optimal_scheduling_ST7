@@ -15,6 +15,7 @@ def plot_save(result_dict: dict, parameters: dict):
     min_results = np.empty((parameters['iteration number'],))
     mean_results = np.empty((parameters['iteration number'],))
     standard_deviation = np.empty((parameters['iteration number'],))
+    median_results = np.empty((parameters['iteration number'],))
     num_ant = len(result_dict[0])
     for iter in iteration:
         # extraction
@@ -30,6 +31,7 @@ def plot_save(result_dict: dict, parameters: dict):
         min_results[iter] = np.min(iteration_makespan)/tu
         mean_results[iter] = np.mean(iteration_makespan)/tu
         standard_deviation[iter] = np.std(iteration_makespan)/tu
+        median_results[iter] = np.median(iteration_makespan)/tu
 
         if parameters['log scale']:
             max_results = np.log10(max_results)
@@ -49,6 +51,8 @@ def plot_save(result_dict: dict, parameters: dict):
              color="purple", label="mean + std")
     plt.plot(iteration, mean_results-standard_deviation,
              color="blue", label="mean - std")
+    plt.plot(iteration, median_results, linestyle='-',
+             color='black', label='median')
     plt.xlabel("Iterations of ant colony")
     plt.ylabel("Makespan (h)")
     plt.title("Optimization of {0} with {1} ants and {2} iterations. \n Q = {3}, rho = {4}, alpha = {5}, beta = {6}, C = {7}".format(graph_name,

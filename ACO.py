@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 from Job import Job
 from Machine import Machine
 from math import floor
+from copy import copy
+
 
 # Establishing communication
 comm = MPI.COMM_WORLD
@@ -49,10 +51,10 @@ def get_next_available_jobs(graph: nx.DiGraph, visited_jobs, completed_job: Job)
 
 def probabilites_construction(alpha: float, beta: float, eta: np.array, pheromone_matrix: np.array, jobs_to_index_mapping, current_node: Job = None, available_nodes=None):
     available_idx = list(
-        map(lambda x: jobs_to_index_mapping[x], available_nodes))
+        map(lambda x: jobs_to_index_mapping[x.num], available_nodes))
     available_probabilites = np.ones(len(available_idx))
     if current_node != None:
-        current_idx = jobs_to_index_mapping[current_node]
+        current_idx = jobs_to_index_mapping[current_node.num]
         for idx in range(len(available_idx)):
             available_probabilites[idx] = pheromone_matrix[current_idx,
                                                            available_idx[idx]] ** alpha * eta[current_idx, available_idx[idx]] ** beta
@@ -89,7 +91,8 @@ def ACO_hybrid_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10
         rank, comm_size, local_num_ant))
     # Mappings from Job to Indices of Phermonone/Visibility Matrices
     index_to_jobs_mapping = {idx: job for idx, job in enumerate(graph.nodes())}
-    jobs_to_index_mapping = {job: idx for idx, job in enumerate(graph.nodes())}
+    jobs_to_index_mapping = {job.num: idx for idx,
+                             job in enumerate(graph.nodes())}
 
     # Initialise the Phermonone Matrix and Visbility Matrix
     pheromone_matrix = np.ones((len(graph), len(graph)))
@@ -135,7 +138,7 @@ def ACO_hybrid_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10
 
             machines.sort(key=lambda machine: machine.current_job_end_time)
             machines[0].perform_job(current_node, completed_jobs)
-            ant_path = [current_node]
+            ant_path = [copy(current_node)]
             available_nodes.remove(current_node)
 
             # starting tour
@@ -152,21 +155,25 @@ def ACO_hybrid_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10
                 machines.sort(key=lambda machine: machine.current_job_end_time)
                 machines[0].perform_job(next_node, completed_jobs)
                 visited_jobs.add(next_node)
-                ant_path.append(next_node)
+                ant_path.append(copy(next_node))
                 available_nodes.remove(next_node)
                 current_node = next_node
 
             # everything is done
             completed_jobs.clear()
             # get solution localized
-            local_ant_solutions.append((ant_path, machines))
+            local_ant_solutions.append(
+                (ant_path, [copy(machine) for machine in machines]))
             # get the makespan localized
             local_current_makespan = makespan(machines)
 
             # Update best local ant
+            if local_current_makespan < best_local_makespan:
+                best_local_makespan = local_current_makespan
+                best_local_schedule = copy(machines)
             if local_current_makespan < best_global_makespan:
                 best_global_makespan = local_current_makespan
-                best_global_schedule = machines
+                best_global_schedule = copy(machines)
             # no more in the ant loop
             # every local ants have done their tour
             local_iterations_results[it] = []
@@ -175,16 +182,14 @@ def ACO_hybrid_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10
                 local_ant_solutions[ant][1]))
 
         # adding a best ant method
-        best_ant_index = np.argmin(
-            list(map(lambda x: makespan(x[1]), local_ant_solutions)))
-        best_ant_makespan = makespan(local_ant_solutions[best_ant_index][1])
+        best_ant_makespan = comm.allreduce(best_local_makespan, op=MPI.MIN)
 
         if basic_ants and (it+1 > floor(num_iterations*switching_rate)) and n_best != 0:
             basic_ants = False
 
             # Updating the Pheromone Matrix after each ant
             # Evaporation affect all process the same...
-        pheromone_matrix *= (1-evaporation_rate)
+        pheromone_matrix = (1-evaporation_rate) * pheromone_matrix
         # local addition of ants' choice
         local_pheromone_addition_matrix = np.zeros_like(pheromone_matrix)
         if basic_ants:
@@ -192,11 +197,13 @@ def ACO_hybrid_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10
             for ant_solution in local_ant_solutions:
                 for i in range(len(ant_solution[0]) - 1):
                     if reward == 'exp':
-                        local_pheromone_addition_matrix[jobs_to_index_mapping[ant_solution[0][i]],
-                                                        jobs_to_index_mapping[ant_solution[0][i+1]]] += q*np.exp(C*(best_ant_makespan-makespan(ant_solution[1]))/best_ant_makespan)
+                        neg_error = (
+                            best_global_makespan-makespan(ant_solution[1]))/best_global_makespan
+                        local_pheromone_addition_matrix[jobs_to_index_mapping[ant_solution[0][i].num],
+                                                        jobs_to_index_mapping[ant_solution[0][i+1].num]] += q*np.exp(C*neg_error)
                     elif reward == 'frac':
-                        local_pheromone_addition_matrix[jobs_to_index_mapping[ant_solution[0][i]],
-                                                        jobs_to_index_mapping[ant_solution[0][i+1]]] += q*(1-(best_ant_makespan-makespan(ant_solution[1]))/best_ant_makespan)
+                        local_pheromone_addition_matrix[jobs_to_index_mapping[ant_solution[0][i].num],
+                                                        jobs_to_index_mapping[ant_solution[0][i+1].num]] += q*(1-(best_ant_makespan-makespan(ant_solution[1]))/best_ant_makespan)
 
             global_addition_matrix = np.zeros_like(
                 local_pheromone_addition_matrix)
@@ -230,8 +237,8 @@ def ACO_hybrid_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10
 
                 for ant_solution in best_ants:
                     for i in range(len(ant_solution[0]) - 1):
-                        local_pheromone_addition_matrix[jobs_to_index_mapping[ant_solution[0][i]],
-                                                        jobs_to_index_mapping[ant_solution[0][i+1]]] += q*num_ants*np.exp(C*(best_ant_makespan-makespan(ant_solution[1]))/best_ant_makespan)
+                        local_pheromone_addition_matrix[jobs_to_index_mapping[ant_solution[0][i].num],
+                                                        jobs_to_index_mapping[ant_solution[0][i+1].num]] += q*num_ants*np.exp(C*(best_ant_makespan-makespan(ant_solution[1]))/best_ant_makespan)
                 # exit 0 process
             # colecting
             comm.Bcast(elite_pheromon, root=0)
@@ -246,6 +253,7 @@ def ACO_hybrid_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10
     return best_global_makespan, best_global_schedule, local_iterations_results
 
 
+"""
 def ACO_elite_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10, alpha: float = 1.0, beta: float = 2.0, evaporation_rate: float = 0.2, q: float = 1.0, num_iterations: int = 100):
     '''
     graph : directed graph
@@ -345,7 +353,7 @@ def ACO_elite_ants(graph: nx.DiGraph, num_machines: int = 2, num_ants: int = 10,
             best_global_schedule = best_ant_solution[1]
 
     return best_global_makespan, best_global_schedule, iterations_results
-
+"""
 
 if __name__ == "__main__":
 
